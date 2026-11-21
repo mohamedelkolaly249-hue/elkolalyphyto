@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PHYTO-OSCE PRO | Multi-Station Clinical Pharmacy Suite — MNU</title>
+
+  <!-- Google Fonts: Cairo, Plus Jakarta Sans, Cormorant Garamond, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#030B09',
+            emeraldDark: '#061B15',
+            emeraldCard: '#0A2920',
+            emeraldGlow: '#10B981',
+            goldRoyal: '#D4AF37',
+            goldLight: '#F8E7A6',
+            ivory: '#FAF8F2',
+            crimson: '#F43F5E'
+          },
+          fontFamily: {
+            sans: ['Cairo', 'Plus Jakarta Sans', 'sans-serif'],
+            serif: ['Cormorant Garamond', 'serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: #030B09;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -15%, rgba(16, 185, 129, 0.22), transparent 65%),
+        radial-gradient(ellipse 55% 45% at 95% 15%, rgba(212, 175, 55, 0.14), transparent 60%),
+        linear-gradient(rgba(212, 175, 55, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212, 175, 55, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 42px 42px, 42px 42px;
+      color: #FAF8F2;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Executive Glass Panels */
+    .glass-panel {
+      background: linear-gradient(155deg, rgba(10, 41, 32, 0.84) 0%, rgba(3, 11, 9, 0.94) 100%);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(212, 175, 55, 0.26);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(248, 231, 166, 0.14);
+    }
+
+    .station-card {
+      background: linear-gradient(160deg, rgba(12, 48, 37, 0.72) 0%, rgba(4, 15, 12, 0.9) 100%);
+      border: 1px solid rgba(212, 175, 55, 0.24);
+      transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .station-card:hover {
+      border-color: rgba(248, 231, 166, 0.65);
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(212, 175, 55, 0.14);
+    }
+
+    .interactive-tile {
+      background: rgba(6, 27, 21, 0.76);
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      transition: all 0.22s ease;
+    }
+
+    .interactive-tile:hover:not(:disabled) {
+      border-color: rgba(248, 231, 166, 0.55);
+      background: rgba(13, 52, 40, 0.88);
+      transform: translateY(-1px);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #D4AF37 0%, #F8E7A6 48%, #B5891C 100%);
+      color: #030B09;
+      font-weight: 800;
+      box-shadow: 0 8px 26px rgba(212, 175, 55, 0.32);
+      transition: all 0.22s ease;
+    }
+
+    .btn-gold:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(212, 175, 55, 0.48);
+    }
+
+    .btn-gold:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Animations */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-view {
+      animation: fadeSlideUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes ecgFlow {
+      0% { stroke-dashoffset: 260; }
+      100% { stroke-dashoffset: 0; }
+    }
+    .ecg-wave {
+      stroke-dasharray: 260;
+      animation: ecgFlow 2.4s linear infinite;
+    }
+
+    @keyframes liquidRise {
+      0% { transform: scaleY(0.2); opacity: 0.6; }
+      100% { transform: scaleY(1); opacity: 1; }
+    }
+    .reagent-liquid {
+      transform-origin: bottom;
+      animation: liquidRise 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* 3D Flip Case Card */
+    .flip-scene { perspective: 1300px; }
+    .flip-card {
+      position: relative;
+      width: 100%;
+      min-height: 290px;
+      transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      transform-style: preserve-3d;
+    }
+    .flip-card.flipped { transform: rotateY(180deg); }
+    .flip-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .flip-back { transform: rotateY(180deg); }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(3, 11, 9, 0.7); }
+    ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.42); border-radius: 99px; }
+
+    [dir="rtl"] .rtl-flip { transform: scaleX(-1); }
+
+    @media print {
+      body { background: #ffffff !important; color: #000000 !important; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-goldRoyal selection:text-obsidian flex flex-col">
+
+  <!-- =========================================================================
+       TOP EXECUTIVE NAVIGATION BAR
+       ========================================================================= -->
+  <header class="sticky top-0 z-40 border-b border-goldRoyal/25 bg-obsidian/88 backdrop-blur-2xl px-4 sm:px-6 py-3 no-print">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand + Back to Hub -->
+      <div class="flex items-center gap-3">
+        <button onclick="openHub()" class="w-11 h-11 rounded-2xl bg-gradient-to-br from-goldRoyal via-goldLight to-amber-700 p-[1.5px] shadow-lg hover:scale-105 transition" title="قاعة المحطات">
+          <div class="w-full h-full rounded-[14px] bg-obsidian flex items-center justify-center">
+            <i data-lucide="stethoscope" class="w-5 h-5 text-goldLight"></i>
+          </div>
+        </button>
+        <div>
+          <div class="flex items-center gap-2">
+            <button onclick="openHub()" class="font-serif text-xl sm:text-2xl font-bold tracking-wider text-goldLight hover:text-white transition leading-none">
+              PHYTO-OSCE <span class="text-emeraldGlow">PRO</span>
+            </button>
+            <span id="hdr-rank" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emeraldGlow/15 text-emeraldGlow border border-emeraldGlow/40">
+              صيدلي متدرب
+            </span>
+          </div>
+          <p id="hdr-sub" class="text-[11px] text-ivory/65 mt-0.5">
+            منظومة المحطات الإكلينيكية المتكاملة • قسم العقاقير — كلية الصيدلة جامعة المنصورة الأهلية (MNU)
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Controls -->
+      <div class="flex items-center gap-2">
+        <button id="btn-back-hub" onclick="openHub()" class="hidden interactive-tile px-3 py-1.5 rounded-xl text-xs font-bold text-goldLight flex items-center gap-1.5">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-goldRoyal"></i>
+          <span id="lbl-back-hub">قاعة المحطات</span>
+        </button>
+
+        <button onclick="toggleTimer()" class="interactive-tile px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-mono font-bold text-goldLight">
+          <i data-lucide="timer" class="w-3.5 h-3.5 text-emeraldGlow" id="icon-timer"></i>
+          <span id="lbl-timer">06:00</span>
+        </button>
+
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emeraldDark border border-goldRoyal/35">
+          <i data-lucide="award" class="w-4 h-4 text-goldRoyal"></i>
+          <span class="font-mono text-xs font-bold text-goldLight" id="lbl-xp">0 XP</span>
+        </div>
+
+        <button onclick="toggleMute()" class="interactive-tile p-2 rounded-xl text-goldLight" title="الصوت">
+          <i data-lucide="volume-2" class="w-4 h-4" id="icon-mute"></i>
+        </button>
+
+        <button onclick="toggleLang()" class="interactive-tile px-3 py-1.5 rounded-xl text-xs font-bold text-goldLight flex items-center gap-1.5">
+          <i data-lucide="globe" class="w-3.5 h-3.5 text-goldRoyal"></i>
+          <span id="lbl-lang">EN</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       VIEW 1: OSCE FLOOR HUB (LOBBY OF 4 CLINICAL CASE STATIONS)
+       ========================================================================= -->
+  <main id="view-hub" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-7 space-y-7 animate-view">
+    <!-- Hero Executive Banner -->
+    <section class="glass-panel rounded-[28px] p-6 sm:p-8 relative overflow-hidden">
+      <div class="absolute -top-24 -end-24 w-72 h-72 rounded-full bg-goldRoyal/10 blur-3xl pointer-events-none"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+        <div class="lg:col-span-8 space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-goldRoyal/15 border border-goldRoyal/40 text-goldLight text-xs font-bold">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-goldRoyal"></i>
+            <span id="hub-eyebrow">تطبيق عملي متقدم لمادة الفايتوثيرابي والعقاقير — MNU</span>
+          </div>
+          <h1 id="hub-title" class="text-2xl sm:text-4xl font-black text-white leading-tight">
+            اختر محطة الحالة الإكلينيكية وابدأ جولة الـ <span class="text-goldLight">OSCE</span> الاحترافية
+          </h1>
+          <p id="hub-desc" class="text-sm text-ivory/75 max-w-2xl leading-relaxed">
+            كل حالة مقسمة إلى 4 محطات سريرية مستقلة: (١) الفرز والعلامات الحيوية، (٢) غرفة الاستشارة الحية، (٣) مختبر العقاقير والاختبارات الكيميائية، و(٤) محطة الصرف والرادار والمحاكاة 4D.
+          </p>
+        </div>
+
+        <!-- Global Progress Telemetry -->
+        <div class="lg:col-span-4 p-4 rounded-2xl bg-obsidian/75 border border-goldRoyal/30 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-goldLight" id="hub-prog-title">تقدمك في قاعة المحطات</span>
+            <span class="font-mono text-xs font-bold text-emeraldGlow" id="hub-prog-count">0 / 4</span>
+          </div>
+          <div class="w-full h-2.5 rounded-full bg-emeraldDark overflow-hidden border border-goldRoyal/25">
+            <div id="hub-prog-bar" class="h-full bg-gradient-to-r from-emeraldGlow to-goldLight transition-all duration-500" style="width: 0%"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-1 text-center">
+            <div class="p-2 rounded-xl bg-emeraldDark/80 border border-white/5">
+              <div class="text-[10px] text-ivory/60" id="hub-stat-stars-lbl">النجوم المكتسبة</div>
+              <div class="font-mono text-base font-extrabold text-goldLight mt-0.5" id="hub-stat-stars">0 / 12</div>
+            </div>
+            <div class="p-2 rounded-xl bg-emeraldDark/80 border border-white/5">
+              <div class="text-[10px] text-ivory/60" id="hub-stat-rank-lbl">التصنيف الإكلينيكي</div>
+              <div class="text-xs font-extrabold text-emeraldGlow mt-1 truncate" id="hub-stat-rank">صيدلي متدرب</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 Clinical Case Station Cards Grid -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-5" id="hub-cases-grid"></section>
+  </main>
+
+  <!-- =========================================================================
+       VIEW 2: ACTIVE CASE WORKSPACE (4 INTERACTIVE SUB-STATIONS)
+       ========================================================================= -->
+  <main id="view-station" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 space-y-5">
+
+    <!-- Active Case Identity Strip + 4-Station Navigation Stepper -->
+    <section class="glass-panel rounded-3xl p-4 space-y-4 no-print">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-goldRoyal/20 pb-3.5">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-emeraldDark border border-goldRoyal/45 flex items-center justify-center shrink-0">
+            <span class="font-mono font-extrabold text-goldLight text-base" id="ws-case-num">01</span>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <h2 class="text-base sm:text-lg font-extrabold text-white" id="ws-pt-name">—</h2>
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-400/40" id="ws-pt-badge">—</span>
+            </div>
+            <p class="text-xs text-ivory/70" id="ws-pt-meta">—</p>
+          </div>
+        </div>
+
+        <!-- Patient Trust Meter -->
+        <div class="flex items-center gap-3 bg-obsidian/70 px-3.5 py-2 rounded-2xl border border-goldRoyal/25">
+          <i data-lucide="heart-handshake" class="w-4 h-4 text-emeraldGlow"></i>
+          <div class="min-w-[110px]">
+            <div class="flex items-center justify-between text-[10px] font-bold text-goldLight mb-1">
+              <span id="ws-trust-lbl">ثقة المريض</span>
+              <span class="font-mono" id="ws-trust-pct">70%</span>
+            </div>
+            <div class="w-full h-1.5 rounded-full bg-emeraldDark overflow-hidden">
+              <div id="ws-trust-bar" class="h-full bg-gradient-to-r from-emeraldGlow to-goldLight transition-all duration-500" style="width: 70%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 Dedicated OSCE Station Tabs -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5" id="station-stepper"></div>
+    </section>
+
+    <!-- Dynamic Station Stage Content -->
+    <section id="station-stage" class="animate-view"></section>
+
+    <!-- Bottom Station Navigation Controls -->
+    <section class="flex items-center justify-between gap-3 pt-1 no-print">
+      <button id="btn-prev-st" onclick="stepStation(-1)" class="interactive-tile px-4 py-2.5 rounded-2xl text-xs font-bold text-ivory flex items-center gap-2">
+        <i data-lucide="arrow-right" class="w-4 h-4 text-goldRoyal rtl-flip"></i>
+        <span id="lbl-prev-st">المحطة السابقة</span>
+      </button>
+
+      <div class="text-xs font-mono text-ivory/60 hidden sm:block" id="lbl-stage-indicator">STATION 1 OF 4</div>
+
+      <button id="btn-next-st" onclick="stepStation(1)" class="btn-gold px-5 py-2.5 rounded-2xl text-xs flex items-center gap-2">
+        <span id="lbl-next-st">الانتقال للمحطة التالية</span>
+        <i data-lucide="arrow-left" class="w-4 h-4 rtl-flip"></i>
+      </button>
+    </section>
+  </main>
+
+  <!-- =========================================================================
+       4D OUTCOME & MNU CLINICAL COMPETENCY CERTIFICATE MODAL
+       ========================================================================= -->
+  <div id="outcome-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-5 bg-black/82 backdrop-blur-md overflow-y-auto">
+    <div class="glass-panel max-w-2xl w-full rounded-[28px] p-5 sm:p-7 border-2 border-goldRoyal/60 space-y-5 my-auto animate-view">
+      <div class="flex items-start justify-between gap-3 border-b border-goldRoyal/25 pb-4">
+        <div>
+          <span id="out-badge" class="font-mono text-xs font-bold uppercase tracking-wider text-emeraldGlow">4D OUTCOME</span>
+          <h3 id="out-title" class="text-xl sm:text-2xl font-black text-white mt-1">—</h3>
+        </div>
+        <div id="out-stars" class="flex items-center gap-1 shrink-0"></div>
+      </div>
+
+      <!-- 4D Timeline -->
+      <div id="out-timeline" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
+
+      <!-- Patient Voice -->
+      <div class="p-4 rounded-2xl bg-emeraldDark/85 border border-goldRoyal/30 space-y-1.5">
+        <div class="text-xs font-bold text-goldLight flex items-center gap-1.5">
+          <i data-lucide="message-circle-heart" class="w-4 h-4 text-emeraldGlow"></i>
+          <span id="out-reply-lbl">رسالة متابعة المريض:</span>
+        </div>
+        <p id="out-reply" class="text-sm text-ivory leading-relaxed">—</p>
+      </div>
+
+      <!-- Pharmacognosy Debrief -->
+      <div class="p-4 rounded-2xl bg-obsidian/90 border border-white/10 space-y-1.5">
+        <div class="text-xs font-extrabold text-goldRoyal uppercase tracking-wider flex items-center gap-1.5">
+          <i data-lucide="microscope" class="w-4 h-4"></i>
+          <span id="out-science-lbl">التحليل العلمي ومبادئ العقاقير (MNU Pharmacognosy Debrief)</span>
+        </div>
+        <p id="out-science" class="text-xs sm:text-sm text-ivory/90 leading-relaxed">—</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex flex-wrap items-center justify-between gap-2.5 pt-2 no-print">
+        <div class="flex items-center gap-2">
+          <button onclick="closeOutcomeModal()" class="interactive-tile px-4 py-2.5 rounded-xl text-xs font-bold text-ivory flex items-center gap-1.5">
+            <i data-lucide="rotate-ccw" class="w-4 h-4 text-goldRoyal"></i>
+            <span id="out-retry-lbl">مراجعة الوصفة</span>
+          </button>
+          <button onclick="window.print()" class="interactive-tile px-3.5 py-2.5 rounded-xl text-xs font-bold text-goldLight flex items-center gap-1.5">
+            <i data-lucide="printer" class="w-4 h-4 text-goldRoyal"></i>
+            <span id="out-print-lbl">طباعة التقرير</span>
+          </button>
+        </div>
+
+        <button onclick="proceedNextCase()" class="btn-gold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5">
+          <span id="out-next-lbl">الحالة التالية في الـ OSCE</span>
+          <i data-lucide="arrow-left" class="w-4 h-4 rtl-flip"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================================
+       PROCEDURAL WEB AUDIO SYNTHESIZER (NO EXTERNAL FILES)
+       ========================================================================= */
+    const SFX = {
+      ctx: null,
+      muted: false,
+      play(type) {
+        if (this.muted) return;
+        try {
+          if (!this.ctx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AC();
+          }
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          if (type === 'tap') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(540, now);
+            gain.gain.setValueAtTime(0.035, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+            osc.start(now);
+            osc.stop(now + 0.07);
+          } else if (type === 'clue') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(620, now);
+            osc.frequency.setValueAtTime(930, now + 0.08);
+            gain.gain.setValueAtTime(0.055, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+            osc.start(now);
+            osc.stop(now + 0.22);
+          } else if (type === 'lab') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(420, now);
+            osc.frequency.exponentialRampToValueAtTime(860, now + 0.25);
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+            osc.start(now);
+            osc.stop(now + 0.28);
+          } else if (type === 'success') {
+            [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+              const o = this.ctx.createOscillator();
+              const g = this.ctx.createGain();
+              o.type = 'triangle';
+              o.frequency.setValueAtTime(freq, now + i * 0.08);
+              g.gain.setValueAtTime(0.06, now + i * 0.08);
+              g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.34);
+              o.connect(g);
+              g.connect(this.ctx.destination);
+              o.start(now + i * 0.08);
+              o.stop(now + i * 0.08 + 0.34);
+            });
+          } else if (type === 'alarm') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(195, now);
+            osc.frequency.linearRampToValueAtTime(130, now + 0.3);
+            gain.gain.setValueAtTime(0.065, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+            osc.start(now);
+            osc.stop(now + 0.32);
+          }
+        } catch (e) { /* Audio blocked */ }
+      }
+    };
+
+    /* =========================================================================
+       MASTER PHARMACOGNOSY & MNU CLINICAL CASES DATA
+       ========================================================================= */
+    const HERBS = [
+      {
+        id: 'ginger_hyoscyamus',
+        colorHex: '#A855F7',
+        reagentColorLabel: { ar: 'بنفسجي عميق (Vitali-Morin Positive)', en: 'Deep Violet (Vitali-Morin Positive)' },
+        ar: {
+          name: 'زنجبيل + بنج (Ginger + Hyoscyamus)',
+          latin: 'Zingiber officinale + Hyoscyamus niger',
+          constituents: '6-Gingerol & Shogaols + قلويدات التروبان (L-Hyoscyamine & Scopolamine).',
+          mechanism: 'تآزر مزدوج: البنج يغلق مستقبلات M1 و H1 في المركز الدهليزي بالمخ لمنع دوار الحركة، والزنجبيل يضاد مستقبلات 5-HT3 في المعدة لتهدئة الغثيان.',
+          qcName: 'اختبار Vitali-Morin الكيميائي + HPLC',
+          qcResult: 'تفاعل حمض النيتريك المدخن ثم KOH الكحولي يعطي لوناً بنفسجياً فورياً يؤكد وجود قلويدات التروبان المعيارية.',
+          cautions: 'ممنوع في الجلوكوما وتضخم البروستاتا والحمل/الرضاعة؛ ويجب فحص خلو السواغ من زيت الفول السوداني لمرضى الحساسية.'
+        },
+        en: {
+          name: 'Ginger + Hyoscyamus',
+          latin: 'Zingiber officinale + Hyoscyamus niger',
+          constituents: '6-Gingerol & Shogaols + Tropane Alkaloids (L-Hyoscyamine & Scopolamine).',
+          mechanism: 'Dual synergy: Hyoscyamus blocks central vestibular M1/H1 receptors to prevent motion sickness; Ginger antagonizes gastric 5-HT3 receptors.',
+          qcName: 'Vitali-Morin Chemical Test + HPLC',
+          qcResult: 'Fuming HNO3 followed by alcoholic KOH yields an immediate deep violet color confirming standardized tropane alkaloids.',
+          cautions: 'Contraindicated in glaucoma, BPH, pregnancy/lactation; verify arachis-oil-free capsule excipients in peanut-allergic patients.'
+        }
+      },
+      {
+        id: 'pure_ginger',
+        colorHex: '#F59E0B',
+        reagentColorLabel: { ar: 'أزرق-بنفسجي / كهرماني (Vanillin-H2SO4)', en: 'Amber-Violet Band (Vanillin-H2SO4)' },
+        ar: {
+          name: 'زنجبيل معياري فقط (Pure Ginger)',
+          latin: 'Zingiber officinale',
+          constituents: '6-Gingerol, 8-Gingerol, 6-Shogaol والزيت الطيار Zingiberene.',
+          mechanism: 'مضاد لمستقبلات 5-HT3 الطرفية في الجهاز الهضمي وينشط إفراغ المعدة دون إرخاء صمام المريء السفلي (LES).',
+          qcName: 'الفحص الميكروسكوبي + Vanillin-H2SO4 TLC',
+          qcResult: 'حبيبات نشا كيسية الشكل (Sack-shaped starch) وألياف مقسمة غير ملجننة مع بقعة مميزة للـ 6-Gingerol.',
+          cautions: 'البديل الآمن المثالي لمرضى ارتجاع المريء (GERD) وفتق الحجاب الحاجز؛ يُحذر من الجرعات العالية مع مضادات التجلط.'
+        },
+        en: {
+          name: 'Standardized Pure Ginger',
+          latin: 'Zingiber officinale',
+          constituents: '6-Gingerol, 8-Gingerol, 6-Shogaol & volatile sesquiterpene Zingiberene.',
+          mechanism: 'Peripheral gastric 5-HT3 antagonist; accelerates gastric emptying without relaxing the Lower Esophageal Sphincter (LES).',
+          qcName: 'Microscopy + Vanillin-H2SO4 TLC',
+          qcResult: 'Diagnostic sack-shaped starch granules & non-lignified septate fibers with clear 6-Gingerol TLC fingerprint.',
+          cautions: 'Ideal GERD-safe alternative to peppermint in reflux & hiatal hernia patients; caution with high-dose anticoagulants.'
+        }
+      },
+      {
+        id: 'peppermint',
+        colorHex: '#10B981',
+        reagentColorLabel: { ar: 'زمردي نقي — L-Menthol 44% (GC-MS)', en: 'Pure Emerald — L-Menthol 44% (GC-MS)' },
+        ar: {
+          name: 'زيت النعناع الفلفلي (Peppermint Oil)',
+          latin: 'Mentha × piperita',
+          constituents: 'L-Menthol (35–55%), Menthone (14–32%), Menthyl acetate و 1,8-Cineole.',
+          mechanism: 'ينشط مستقبلات البرودة TRPM8 ويغلق قنوات الكالسيوم في العضلات الملساء، مما يؤدي لإرخاء صمام المريء السفلي (LES).',
+          qcName: 'بصمة GC-MS + الغدد الشعرية الشفوية',
+          qcResult: 'تأكيد نقاء L-Menthol وخلوه من السمية العالية لـ Pulegone و Menthofuran مع ظهور غدد شعرية من 8 خلايا.',
+          cautions: 'ممنوع قطعياً قرب وجه الرضع (< سنتين) لخطر تشنج الحنجرة وتوقف التنفس (TRPM8)، ويفاقم GERD وفتق الحجاب الحاجز.'
+        },
+        en: {
+          name: 'Peppermint Oil',
+          latin: 'Mentha × piperita',
+          constituents: 'L-Menthol (35–55%), Menthone (14–32%), Menthyl acetate & 1,8-Cineole.',
+          mechanism: 'Activates TRPM8 cold receptors & blocks smooth-muscle Ca2+ channels, decreasing Lower Esophageal Sphincter (LES) tone.',
+          qcName: 'GC-MS Fingerprint + Labiaceous Trichomes',
+          qcResult: 'Confirms high L-Menthol purity within low Pulegone/Menthofuran limits + diagnostic 8-celled glandular trichomes.',
+          cautions: 'Strictly contraindicated near infants (<2 yrs) due to TRPM8 laryngospasm/apnea; aggravates GERD & hiatal hernia.'
+        }
+      },
+      {
+        id: 'liquorice',
+        colorHex: '#EA580C',
+        reagentColorLabel: { ar: 'برتقالي مصفر عميق (80% H2SO4)', en: 'Deep Orange-Yellow (80% H2SO4)' },
+        ar: {
+          name: 'جذور العرقسوس (Liquorice Root)',
+          latin: 'Glycyrrhiza glabra',
+          constituents: 'Glycyrrhizin (حمض الجليسريزيك) وفلافونويدات Liquiritin.',
+          mechanism: 'ملطف للغشاء المخاطي، لكنه يثبط إنزيم 11β-HSD2 مسبباً احتباس الصوديوم والماء ونقص البوتاسيوم وارتفاع الضغط.',
+          qcName: 'تفاعل 80% H2SO4 + غمد البلورات',
+          qcResult: 'لون برتقالي-أصفر مميز مع حزم ألياف محاطة بغمد بلوري من أوكسالات الكالسيوم (Crystal sheath).',
+          cautions: 'غير مستطب لدوار الحركة أو غثيان السفر؛ وممنوع في ارتفاع الضغط وقصور القلب ومع مدرات البول والديجوكسين.'
+        },
+        en: {
+          name: 'Liquorice Root',
+          latin: 'Glycyrrhiza glabra',
+          constituents: 'Glycyrrhizin (glycyrrhizic acid) & Liquiritin flavonoids.',
+          mechanism: 'Gastric demulcent, but inhibits 11β-HSD2 causing pseudoaldosteronism (Na+ retention, hypokalemia, hypertension).',
+          qcName: '80% H2SO4 Test + Crystal Sheath',
+          qcResult: 'Characteristic orange-yellow reaction + lignified fibers encased in a calcium oxalate crystal sheath.',
+          cautions: 'Not indicated for motion sickness; contraindicated in hypertension, heart failure, diuretics, or digoxin.'
+        }
+      }
+    ];
+
+    const FORMS = [
+      {
+        id: 'tasteless_capsule',
+        ar: 'كبسولات معيارية مغلفة عديمة الطعم (قبل السفر بـ 30–60 دقيقة)',
+        en: 'Tasteless Standardized Capsules (30–60 min pre-travel)'
+      },
+      {
+        id: 'raw_tea',
+        ar: 'شاي أعشاب سائب خام غير معياري',
+        en: 'Unstandardized Loose Herbal Tea Infusion'
+      },
+      {
+        id: 'nasal_inhaler',
+        ar: 'قلم استنشاق عطري موضعي للبالغين فقط (Nasal Inhaler)',
+        en: 'Adult-Only Aromatic Nasal Inhaler Stick'
+      }
+    ];
+
+    const SAFETIES = [
+      {
+        id: 'synergy_education',
+        ar: 'شرح التآزر: البنج (M1/H1) يمنع الدوار والزنجبيل (5-HT3) يهدئ المعدة',
+        en: 'Explain synergy: Hyoscyamus (M1/H1) prevents motion sickness + Ginger (5-HT3) calms nausea'
+      },
+      {
+        id: 'excipient_check',
+        ar: 'فحص السواغ والتأكد من خلو الكبسولة من زيت الفول السوداني (Peanut-free)',
+        en: 'Audit capsule excipients to confirm zero peanut/arachis oil cross-reactivity'
+      },
+      {
+        id: 'gerd_warning',
+        ar: 'تجنب النعناع تماماً لعدم إرخاء صمام المريء السفلي (LES) وتفاقم GERD',
+        en: 'Avoid peppermint completely to prevent LES relaxation & worsening GERD/hiatal hernia'
+      },
+      {
+        id: 'infant_ban',
+        ar: 'منع وضع أي قطرة نعناع قرب وجه الرضيع (11 شهر) لتجنب تشنج الحنجرة',
+        en: 'Strictly forbid applying peppermint oil near 11-month-old infant face (TRPM8 apnea risk)'
+      },
+      {
+        id: 'anticholinergic_counsel',
+        ar: 'التنبيه من جفاف الفم البسيط وتجنب القيادة أو الكحول مع البنج',
+        en: 'Counsel on mild dry mouth and avoiding driving/sedatives with Hyoscyamus'
+      }
+    ];
+
+    const CASES = [
+      {
+        id: '01',
+        difficulty: { ar: 'متوسط', en: 'Moderate' },
+        correctHerb: 'ginger_hyoscyamus',
+        correctForm: 'tasteless_capsule',
+        requiredSafeties: ['synergy_education', 'anticholinergic_counsel'],
+        ar: {
+          title: 'دوار البحر في رحلة 4 أيام',
+          shortTag: 'Ginger + Hyoscyamus',
+          name: 'كريم محمود (طالب جامعي)',
+          demographics: '19 سنة • ذكر • سليم صحياً',
+          scenario: 'رحلة بحرية (Cruise) لمدة 4 أيام — أسوأ أعراض في أول يومين مع رفض طعم الأعشاب',
+          badge: 'دوار حركي شديد',
+          bp: '118/76',
+          hr: '86 bpm',
+          spo2: '99%',
+          target: 'M1 / H1 + 5-HT3',
+          openingMsg: 'أهلاً يا دكتور، أنا مسافر رحلة بحرية 4 أيام، وفي كل رحلة بحرية بقالي 3 سنين بيجيلي غثيان وترجيع ودوخة صعبة جداً خصوصاً أول يومين. المشكلة إني مبستحملش طعم الأعشاب خالص!',
+          questions: [
+            { id: 'q1', prompt: 'بتاخد أي أدوية حالياً أو عندك أمراض مزمنة أو حساسية؟', reply: 'لأ يا دكتور، صحتي كويسة ومباخدش أي أدوية ومعنديش أي حساسية معروفة.', clue: 'لا توجد أدوية مزمنة أو موانع جلوكوما/بروستاتا.' },
+            { id: 'q2', prompt: 'الأعراض بتزيد إمتى تحديداً في الرحلة؟', reply: 'بتبدأ أول ما المركب يتحرك وبتبقى أسوأ حاجة في أول يومين من الرحلة الـ 4 أيام.', clue: 'ذروة الدوار الدهليزي في أول 48 ساعة من الإبحار.' },
+            { id: 'q3', prompt: 'ليه مش حابب الأعشاب السائلة أو المغلية؟', reply: 'طعمها اللاذع بيخليني أرجّع أكتر، نفسي في حاجة مالهاش طعم خالص.', clue: 'رفض تام للطعم العشبي ← يلزم كبسولات مغلفة معيارية.' },
+            { id: 'q4', prompt: 'سمعت قبل كده عن تركيبة الزنجبيل مع البنج؟', reply: 'أيوة يا دكتور بس عاوز أفهم: ليه الدواء محتاج زنجبيل؟ وهل الزنجبيل هو اللي بيمنع دوار البحر فعلاً؟', clue: 'تم فتح تحدي الصيدلي الإكلينيكي!', triggersChallenge: true }
+          ],
+          challengePrompt: 'المريض بيسألك بتركيز: "ليه الدواء بتاعي محتاج زنجبيل؟ وهل الزنجبيل هو اللي بيمنع دوار البحر فعلاً؟"',
+          challengeOptions: [
+            { text: 'البنج (Hyoscyamus) هو المانع الأساسي لدوار الحركة عبر إغلاق مستقبلات M1/H1 في المخ، بينما الزنجبيل يهدئ المعدة (5-HT3) ويقلل الغثيان بتآزر قوي.', correct: true, reaction: 'ممتاز يا دكتور! كده فهمت دور كل عشبة فيهم واقتنعت تماماً.' },
+            { text: 'الزنجبيل لوحده بيقفل مراكز التوازن في المخ والبنج مجرد مادة حافظة ملهاش دور علاجي.', correct: false, reaction: 'بس أنا قريت إن البنج عشبة قوية جداً! إزاي ملهاش دور؟' },
+            { text: 'الاتنين بيعملوا نفس الحاجة فممكن تشرب شاي زنجبيل مركز وخلاص.', correct: false, reaction: 'أنا لسه قايلك إني مبستحملش طعم شاي الأعشاب يا دكتور!' }
+          ],
+          timeline: [
+            { time: 'قبل الإبحار بـ 45 د', state: 'تناول كبسولة معيارية عديمة الطعم بسهولة تامة دون أي نفور.' },
+            { time: 'اليوم 1–2 (الأمواج)', state: 'ثبات تام في الاتزان الدهليزي وغياب القيء والدوار.' },
+            { time: 'اليوم 4 (الوصول)', state: 'إتمام الرحلة بنجاح مع جفاف فم بسيط جداً تم التعامل معه بشرب الماء.' }
+          ],
+          followUp: 'شكراً بجد يا دكتور! أول مرة أسافر 4 أيام في البحر من غير ما أدوخ أو أرجّع، والكبسولة مالهاش أي طعم فعلاً.',
+          science: 'في دوار البحر الشديد، توفر تركيبة الزنجبيل + البنج تغطية مزدوجة: قلويدات التروبان (L-Hyoscyamine & Scopolamine) تثبط مستقبلات M1 و H1 في الجهاز الدهليزي المركزي، بينما المركبات الفينولية في الزنجبيل (6-Gingerol & Shogaols) تضاد مستقبلات 5-HT3 في المعدة. الكبسولة المعيارية تحل مشكلة رفض الطعم وتضمن جرعة آمنة ودقيقة.'
+        },
+        en: {
+          title: '4-Day Sea Cruise Motion Sickness',
+          shortTag: 'Ginger + Hyoscyamus',
+          name: 'Karim Mahmoud (University Student)',
+          demographics: '19 yrs • Male • Healthy',
+          scenario: '4-Day Cruise — Worst nausea/vomiting in first 2 days; dislikes herbal taste',
+          badge: 'Vestibular Motion Sickness',
+          bp: '118/76',
+          hr: '86 bpm',
+          spo2: '99%',
+          target: 'M1 / H1 + 5-HT3',
+          openingMsg: 'Hi Doctor, I have a 4-day cruise coming up. For 3 years I get severe nausea, vomiting, and dizziness—worst in the first 2 days—and I strongly dislike the taste of herbal remedies!',
+          questions: [
+            { id: 'q1', prompt: 'Do you take any medications or have chronic illnesses or allergies?', reply: 'No Doctor, I am healthy, take zero medications, and have no known allergies.', clue: 'No medications or anticholinergic contraindications (glaucoma/BPH).' },
+            { id: 'q2', prompt: 'When exactly do symptoms peak during the trip?', reply: 'They hit once the ship sails and are worst during the first two days of the 4-day trip.', clue: 'Peak vestibular motion sickness during initial 48 hours.' },
+            { id: 'q3', prompt: 'Why do you prefer avoiding liquid or brewed herbal preparations?', reply: 'Strong herbal flavors immediately trigger my gag reflex; I need something completely tasteless.', clue: 'Strict taste aversion → requires tasteless standardized capsule.' },
+            { id: 'q4', prompt: 'Have you heard of standardized Ginger + Hyoscyamus capsules?', reply: 'Yes, which makes me ask: Why does my remedy need ginger in it? Is ginger the one that actually prevents the sickness?', clue: 'Core Pharmacist Challenge unlocked!', triggersChallenge: true }
+          ],
+          challengePrompt: 'The patient asks: "Why does my remedy need ginger in it? Is ginger the one that actually prevents the sickness?"',
+          challengeOptions: [
+            { text: 'Hyoscyamus is the primary central motion-sickness blocker (vestibular M1/H1 antagonism), while Ginger works synergistically in the gut (5-HT3 antagonism) to settle nausea.', correct: true, reaction: 'That makes total sense Doctor! Now I understand why both are combined.' },
+            { text: 'Ginger alone blocks central vestibular receptors, whereas Hyoscyamus is only an inactive flavoring.', correct: false, reaction: 'Wait—isn’t Hyoscyamus a potent alkaloid herb? That doesn’t sound right.' },
+            { text: 'They do the exact same thing, so you should just drink strong raw ginger tea instead.', correct: false, reaction: 'I just mentioned I cannot tolerate the taste of herbal teas!' }
+          ],
+          timeline: [
+            { time: 'T-45m Pre-Sail', state: 'Swallowed tasteless standardized capsule comfortably with zero taste aversion.' },
+            { time: 'Days 1–2 (Rough Sea)', state: 'Central vestibular M1/H1 + gastric 5-HT3 blockade prevented vomiting and vertigo.' },
+            { time: 'Day 4 (Disembark)', state: 'Completed entire 4-day voyage symptom-free with only mild, managed dry mouth.' }
+          ],
+          followUp: 'Thank you Doctor! For the first time in 3 years I enjoyed the entire 4-day cruise with zero nausea, and the capsule had no taste at all.',
+          science: 'For multi-day cruise motion sickness, Zingiber officinale + Hyoscyamus niger offers dual-site synergy: tropane alkaloids (L-hyoscyamine, scopolamine) block central vestibular M1/H1 receptors, while gingerols/shogaols antagonize peripheral gastric 5-HT3 receptors. Standardized tasteless capsules overcome taste aversion and guarantee accurate alkaloid dosing.'
+        }
+      },
+      {
+        id: '02',
+        difficulty: { ar: 'متقدم', en: 'Intermediate' },
+        correctHerb: 'ginger_hyoscyamus',
+        correctForm: 'tasteless_capsule',
+        requiredSafeties: ['excipient_check', 'anticholinergic_counsel'],
+        ar: {
+          title: 'دوار الطيران وحساسية الفول السوداني',
+          shortTag: 'Ginger + Hyoscyamus',
+          name: 'نور الهدى سالم',
+          demographics: '31 سنة • أنثى • غير حامل',
+          scenario: 'رحلات طيران — غثيان وعرق بارد وقت الإقلاع والمطبات مع حساسية لقاح وفول سوداني',
+          badge: 'فحص حساسية السواغ',
+          bp: '114/74',
+          hr: '92 bpm',
+          spo2: '98%',
+          target: 'Excipient Safety',
+          openingMsg: 'مساء الخير يا دكتور، بقالي سنتين بيجيلي غثيان ودوخة وعرق بارد في كل رحلة طيران وقت الإقلاع والمطبات. أنا عندي حساسية من حبوب اللقاح والفول السوداني—هل ده هيعمل مشكلة؟',
+          questions: [
+            { id: 'q1', prompt: 'هل فيه أي احتمال لوجود حمل أو رضاعة حالياً؟', reply: 'لأ يا دكتور، متأكدة إني مش حامل ومش برضع.', clue: 'استبعاد الحمل والرضاعة يسمح باستخدام تركيبة البنج والزنجبيل.' },
+            { id: 'q2', prompt: 'هل سبق وحصلك حساسية من الزنجبيل؟', reply: 'لأ، حساسيتي من حبوب اللقاح (Pollen) والفول السوداني (Peanut) فقط، ومعنديش حساسية معروفة للزنجبيل.', clue: 'حساسية الفول السوداني تستوجب فحص سواغ الكبسولة (Arachis oil).' },
+            { id: 'q3', prompt: 'بتاخدي أي أدوية مزمنة حالياً؟', reply: 'لأ، مباخدش أي أدوية بانتظام.', clue: 'لا توجد تداخلات دوائية جهازية.' },
+            { id: 'q4', prompt: 'إيه أكتر حاجة مقلقاكي بخصوص الحساسية والعلاج العشبي؟', reply: 'خايفة إن حساسيتي من حبوب اللقاح والفول السوداني تتفاعل مع الأعشاب أو الكبسولات!', clue: 'تم فتح تحدي الصيدلي الإكلينيكي!', triggersChallenge: true }
+          ],
+          challengePrompt: 'المريضة بتسألك بقلق: "أنا عندي حساسية من حبوب اللقاح والفول السوداني، هل ده هيعمل مشكلة مع العلاج؟"',
+          challengeOptions: [
+            { text: 'الزنجبيل والبنج لا ينتميان للفول السوداني، لكن يجب فحص نشرة السواغ (Excipients) للتأكد من خلو الكبسولة الرخوة من زيت الفول السوداني (Arachis oil) ومراقبة أي تحسس نادر.', correct: true, reaction: 'رائع يا دكتور! مكنتش أعرف إن بعض الكبسولات ممكن يدخل في تصنيعها زيت الفول السوداني.' },
+            { text: 'طالما مكتوب على العلبة "طبيعي 100%" يبقى مستحيل يعمل أي حساسية لأي مريض.', correct: false, reaction: 'بس الفول السوداني وحبوب اللقاح حاجات طبيعية برضو وبيعملولي حساسية شديدة!' },
+            { text: 'الزنجبيل من نفس عائلة الفول السوداني وممنوع تماماً عليكي.', correct: false, reaction: 'الزنجبيل من الفصيلة الزنجبيلية (Zingiberaceae) مش البقوليات يا دكتور!' }
+          ],
+          timeline: [
+            { time: 'قبل الإقلاع بـ 45 د', state: 'فحص البطاقة الدوائية والتأكد من خلو الكبسولة من Arachis oil وتناول الجرعة.' },
+            { time: 'الإقلاع والمطبات', state: 'غياب العرق البارد والغثيان تماماً طوال الرحلة الجوية.' },
+            { time: 'الوصول بسلام', state: 'عدم ظهور أي أعراض تحسسية جلدية أو تنفسية واستقرار تام.' }
+          ],
+          followUp: 'الرحلة عدت من غير أي دوخة أو عرق بارد، والأهم إني كنت مطمنة بعد ما راجعت مكونات الكبسولة بنفسي.',
+          science: 'في مرضى الحساسية المتعددة (Pollen & Peanut allergies)، القاعدة الذهبية هي تدقيق المواد غير الفعالة (Excipients) مثل زيت الفول السوداني المكرر (Arachis oil) المستخدم أحياناً في الكبسولات الجيلاتينية الرخوة، مع توضيح أن "الطبيعي" لا يعني انعدام الحساسية.'
+        },
+        en: {
+          title: 'Flight Turbulence & Peanut/Pollen Allergy',
+          shortTag: 'Ginger + Hyoscyamus',
+          name: 'Nour El-Hoda Salem',
+          demographics: '31 yrs • Female • Not Pregnant',
+          scenario: 'Flights — Nausea, dizziness & cold sweat during take-off/turbulence; peanut & pollen allergies',
+          badge: 'Excipient Allergy Audit',
+          bp: '114/74',
+          hr: '92 bpm',
+          spo2: '98%',
+          target: 'Excipient Safety',
+          openingMsg: 'Hello Doctor, for 2 years I get nausea, dizziness, and cold sweating on every flight during take-off and turbulence. I have pollen and peanut allergies—will that be a problem?',
+          questions: [
+            { id: 'q1', prompt: 'Could you possibly be pregnant or breastfeeding right now?', reply: 'No Doctor, I am definitely not pregnant and not breastfeeding.', clue: 'Non-pregnant status confirmed; Hyoscyamus is permissible.' },
+            { id: 'q2', prompt: 'Have you ever reacted to ginger?', reply: 'No known allergy to ginger—only pollen and peanuts.', clue: 'Peanut allergy mandates strict inspection of softgel excipients (arachis oil).' },
+            { id: 'q3', prompt: 'Are you currently taking any regular medications?', reply: 'No, I take no medications.', clue: 'Zero systemic drug-herb interactions.' },
+            { id: 'q4', prompt: 'What is your main concern regarding your allergies and this remedy?', reply: 'I am worried my pollen and peanut allergies might trigger a reaction with herbal capsules!', clue: 'Core Pharmacist Challenge unlocked!', triggersChallenge: true }
+          ],
+          challengePrompt: 'The patient asks: "I am allergic to a few things (pollen and peanut). Will that be a problem?"',
+          challengeOptions: [
+            { text: 'Ginger (Zingiberaceae) and Hyoscyamus do not cross-react with peanuts, but we must verify the capsule excipients are free of refined peanut (arachis) oil and monitor initial dosing.', correct: true, reaction: 'Thank you Doctor! Checking hidden capsule oils gives me real peace of mind.' },
+            { text: 'Natural herbal remedies never cause allergic reactions in anyone.', correct: false, reaction: 'Pollen and peanuts are natural too, and they give me severe reactions!' },
+            { text: 'Ginger belongs to the legume family like peanuts, so you must avoid it.', correct: false, reaction: 'Ginger is a rhizome from Zingiberaceae, not a legume!' }
+          ],
+          timeline: [
+            { time: 'T-45m Pre-Flight', state: 'Verified peanut-free capsule excipients and administered standardized dose.' },
+            { time: 'Take-off & Turbulence', state: 'Autonomic cold sweating and vestibular nausea fully suppressed.' },
+            { time: 'Landing', state: 'Zero hypersensitivity reactions; smooth, comfortable flight.' }
+          ],
+          followUp: 'The flight went smoothly without cold sweats or dizziness, and verifying the capsule excipients made me feel completely safe.',
+          science: 'While Zingiber officinale and Hyoscyamus niger are botanically unrelated to Arachis hypogaea (peanut), patients with peanut allergy require strict excipient verification to exclude refined arachis oil carriers in softgel capsules.'
+        }
+      },
+      {
+        id: '03',
+        difficulty: { ar: 'فخ إكلينيكي', en: 'Clinical Trap' },
+        correctHerb: 'pure_ginger',
+        correctForm: 'tasteless_capsule',
+        requiredSafeties: ['gerd_warning'],
+        ar: {
+          title: 'قلم استنشاق النعناع مع ارتجاع المريء (GERD)',
+          shortTag: 'Peppermint GERD Trap',
+          name: 'مها عبد العزيز',
+          demographics: '37 سنة • أنثى • GERD + فتق حجاب حاجز',
+          scenario: 'تطلب قلم استنشاق زيت النعناع لغثيان السفر بالسيارة وتأخذ PPI ومضاد حموضة',
+          badge: 'فخ ارتخاء صمام المريء',
+          bp: '122/78',
+          hr: '84 bpm',
+          spo2: '99%',
+          target: 'LES Tone / pH',
+          openingMsg: 'لو سمحت يا دكتور عاوزة قلم استنشاق زيت النعناع لغثيان السفر بالعربية. وعارفة تحذيرات الارتجاع ومضادات الحموضة بس مش هتفرق معايا لأني هستنشقه ومش هبلع كبسولة!',
+          questions: [
+            { id: 'q1', prompt: 'إيه التاريخ المرضي اللي عندك في المعدة والمريء؟', reply: 'عندي ارتجاع مريء (GERD) ومتشخصة قبل كده بفتق في الحجاب الحاجز (Hiatal hernia).', clue: 'GERD + فتق الحجاب الحاجز يجعل صمام المريء السفلي شديد الحساسية للمينثول.' },
+            { id: 'q2', prompt: 'بتاخدي أدوية إيه للارتجاع والحموضة؟', reply: 'باخد مضاد حموضة (Antacid) عند اللزوم، ولسه بادئة مثبط مضخة البروتون (PPI).', clue: 'علاج نشط بـ PPI ومضاد حموضة.' },
+            { id: 'q3', prompt: 'هل عندك حساسية من النعناع أو الزنجبيل؟', reply: 'لأ، معنديش حساسية من النعناع ولا الزنجبيل.', clue: 'الزنجبيل المعياري بديل آمن تماماً ولا يرخي الـ LES.' },
+            { id: 'q4', prompt: 'ليه معتقدة إن الاستنشاق ملوش علاقة بتحذيرات الارتجاع؟', reply: 'ما أنا مش هبلع كبسولة توصل المعدة! أنا مجرد هشم ريحته في العربية.', clue: 'تم فتح تحدي الصيدلي الإكلينيكي!', triggersChallenge: true }
+          ],
+          challengePrompt: 'المريضة بتجادلك: "تحذيرات الارتجاع ومضادات الحموضة مش هتفرق معايا لأني هستنشق الزيت ومش هبلع كبسولة!"',
+          challengeOptions: [
+            { text: 'أبخرة المينثول المستنشقة تصل للبلعوم وتُمتص جهازياً فتسبب ارتخاء صمام المريء السفلي (LES) وتفاقم ارتجاع المريء وفتق الحجاب الحاجز؛ البديل الآمن هو الزنجبيل المعياري.', correct: true, reaction: 'فعلاً! مكنتش أتخيل إن استنشاق المينثول ممكن يرخي صمام المريء ويزود الارتجاع.' },
+            { text: 'عندك حق، طالما مش هتبلعي الكبسولة يبقى قلم النعناع آمن 100% ومستحيل يأثر على الارتجاع.', correct: false, reaction: 'لو صرفتلها النعناع هيرجع الارتجاع والحرقان بشدة أثناء السفر!' },
+            { text: 'مضادات الحموضة والـ PPI هتغلف الكبسولة في معدتك فممكن تبلعي كبسولات نعناع عادي.', correct: false, reaction: 'خطأ فادح! مضادات الحموضة بترفع pH المعدة وتذيب الغلاف المعوي للكبسولة بدري!' }
+          ],
+          timeline: [
+            { time: 'تعديل القرار الصيدلي', state: 'استبدال قلم النعناع بكبسولات الزنجبيل المعياري الآمنة لمرضى GERD.' },
+            { time: 'أثناء السفر بالسيارة', state: 'تهدئة غثيان السفر عبر 5-HT3 دون أي ارتخاء في صمام المريء السفلي.' },
+            { time: 'بعد الوصول', state: 'استقرار تام لحالة الارتجاع وفتق الحجاب الحاجز ونجاح خطة الـ PPI.' }
+          ],
+          followUp: 'الحمد لله إني سمعت نصيحتك يا دكتور! الزنجبيل هدّى غثيان العربية من غير أي حرقان أو ارتجاع خالص.',
+          science: 'زيت النعناع (Mentha × piperita) غني بـ L-Menthol الذي يغلق قنوات الكالسيوم في العضلات الملساء ويرخي صمام المريء السفلي (LES)، مما يفاقم ارتجاع المريء وفتق الحجاب الحاجز حتى عبر الاستنشاق المتكرر. الزنجبيل المعياري يعالج الغثيان دون التأثير على ضغط صمام المريء.'
+        },
+        en: {
+          title: 'Peppermint Inhaler in GERD & Hiatal Hernia',
+          shortTag: 'Peppermint GERD Trap',
+          name: 'Maha Abdel-Aziz',
+          demographics: '37 yrs • Female • GERD + Hiatal Hernia',
+          scenario: 'Requests Peppermint Oil Inhaler for road nausea while taking PPI + Antacid',
+          badge: 'LES Relaxation Trap',
+          bp: '122/78',
+          hr: '84 bpm',
+          spo2: '99%',
+          target: 'LES Tone / pH',
+          openingMsg: 'Hi Doctor, I want the Peppermint Oil Inhaler for road travel nausea. Warnings about reflux and antacids shouldn’t matter because I’m inhaling it and not swallowing an enteric-coated capsule!',
+          questions: [
+            { id: 'q1', prompt: 'What is your upper gastrointestinal medical history?', reply: 'I have gastroesophageal reflux disease (GERD) and a previously diagnosed hiatal hernia.', clue: 'GERD + hiatal hernia makes the Lower Esophageal Sphincter (LES) vulnerable to menthol.' },
+            { id: 'q2', prompt: 'Which medications are you currently taking for reflux?', reply: 'I take an antacid when symptoms occur and recently started a proton pump inhibitor (PPI).', clue: 'Active antacid & PPI therapy; enteric-coated peppermint capsules would also prematurely dissolve.' },
+            { id: 'q3', prompt: 'Do you have any allergy to peppermint or ginger?', reply: 'No known allergies to either peppermint or ginger.', clue: 'Standardized ginger is an ideal GERD-safe antiemetic alternative.' },
+            { id: 'q4', prompt: 'Why do you feel inhaling peppermint oil avoids reflux risks?', reply: 'Because I am only sniffing the aroma—not swallowing a pill into my stomach!', clue: 'Core Pharmacist Challenge unlocked!', triggersChallenge: true }
+          ],
+          challengePrompt: 'She argues: "Warnings about reflux and antacids should not matter because I intend to inhale the oil and will not swallow an enteric-coated capsule."',
+          challengeOptions: [
+            { text: 'Inhaled menthol vapors contact pharyngeal mucosa and undergo systemic absorption that relaxes the Lower Esophageal Sphincter (LES), worsening GERD/hiatal hernia; standardized Ginger is the safe alternative.', correct: true, reaction: 'I didn’t realize inhaled menthol could still relax the esophageal sphincter!' },
+            { text: 'You are right—inhaling peppermint oil has zero effect on GERD or hiatal hernia.', correct: false, reaction: 'Dispensing peppermint triggers severe acid reflux flare-ups during the road trip!' },
+            { text: 'Taking antacids protects your stomach, so you can safely swallow peppermint capsules too.', correct: false, reaction: 'False! Antacids raise gastric pH and cause premature rupture of enteric coatings!' }
+          ],
+          timeline: [
+            { time: 'Clinical Intervention', state: 'Switched from Peppermint Inhaler to GERD-safe Standardized Ginger capsules.' },
+            { time: 'During Road Trip', state: 'Motion nausea controlled via 5-HT3 antagonism without lowering LES pressure.' },
+            { time: 'Post-Travel', state: 'Zero heartburn or reflux rebound; PPI therapy remained undisturbed.' }
+          ],
+          followUp: 'Thank goodness I listened to your clinical advice Doctor! Ginger settled my car nausea with zero heartburn.',
+          science: 'L-Menthol in Mentha × piperita relaxes smooth muscle and decreases Lower Esophageal Sphincter (LES) tone, aggravating GERD and hiatal hernia even via frequent inhalation due to oropharyngeal deposition and systemic absorption. Standardized Zingiber officinale relieves travel nausea safely.'
+        }
+      },
+      {
+        id: '04',
+        difficulty: { ar: 'حرج جداً', en: 'Critical Safety' },
+        correctHerb: 'peppermint',
+        correctForm: 'nasal_inhaler',
+        requiredSafeties: ['infant_ban'],
+        ar: {
+          title: 'الرضاعة الطبيعية وخطر المينثول على رضيع 11 شهر',
+          shortTag: 'Infant TRPM8 Alert',
+          name: 'سارة المنشاوي',
+          demographics: '30 سنة • أنثى • مرضعة (طفل 11 شهر)',
+          scenario: 'تريد استنشاق النعناع لنفسها ووضع قطرة زيت نعناع قرب وجه طفلها (11 شهر)',
+          badge: 'إنذار خطر على الرضيع',
+          bp: '112/72',
+          hr: '82 bpm',
+          spo2: '99%',
+          target: 'Infant TRPM8!',
+          openingMsg: 'أهلاً يا دكتور، أنا برضع طبيعي وعاوزة أستخدم قلم استنشاق النعناع لغثيان السفر، وكمان كنت ناوية أحط نقطة صغيرة من زيت النعناع جنب وش ابني اللي عنده 11 شهر عشان ريحته حلوة—ما هو طبيعي!',
+          questions: [
+            { id: 'q1', prompt: 'كم عمر الطفل تحديداً وهل يعاني من أي مشاكل تنفسية؟', reply: 'عنده 11 شهر، وصحته كويسة بس كنت هحط مسحة خفيفة جنب أنفه أو على هدومه القريبة من وشه.', clue: 'الطفل أقل من سنتين (11 شهر) ← خطر قاتل لتشنج الحنجرة وتوقف التنفس!' },
+            { id: 'q2', prompt: 'هل عندك أو عند الطفل أي حساسية معروفة؟', reply: 'لأ، معندناش أي حساسية معروفة.', clue: 'الخطر ليس حساسية بل منعكس عصبي تنفسي (TRPM8 / Kratschmer reflex).' },
+            { id: 'q3', prompt: 'إزاي ناوية تستخدمي قلم الاستنشاق لنفسك؟', reply: 'هستنشقه لنفسي بشكل خفيف وموضعي أثناء السفر وبعيد عن ابني.', clue: 'الاستنشاق الموضعي المعتدل للأم المرضعة مقبول مع إبعاد القلم تماماً عن الرضيع.' },
+            { id: 'q4', prompt: 'إيه رأيك في مقولة إن "الطبيعي" معناه مفيش منه أي أضرار؟', reply: 'بالظبط! عاوزاك تفرقلي بين أمان استخدامي أنا وبين وضعه لابني، وهل الطبيعي آمن دايماً؟', clue: 'تم فتح تحدي الصيدلي الإكلينيكي!', triggersChallenge: true }
+          ],
+          challengePrompt: 'الأم بتسألك: "فرقلي بين أمان استنشاقي أنا للنعناع وبين وضعه قرب وش ابني (11 شهر)، وهل الطبيعي يعني مفيش أضرار؟"',
+          challengeOptions: [
+            { text: 'استنشاقك المعتدل كأم مرضعة مقبول مع حفظ القلم بعيداً عن الطفل، أما وضع زيت النعناع قرب وجه رضيع (11 شهر) فممنوع قطعياً لأنه يسبب تشنج الحنجرة وتوقف التنفس (TRPM8 reflex)؛ والطبيعي قد يكون ساماً جداً.', correct: true, reaction: 'يا ساتر! الحمد لله إني سألتك قبل ما أحط نقطة واحدة جنب وشه!' },
+            { text: 'بما إن زيت النعناع طبيعي 100% فممكن تحطي نقطة مخففة جنب أنف الرضيع عادي جداً.', correct: false, reaction: 'كارثة طبية! المينثول يسبب تشنج حنجري حاد وتوقف تنفس في الرضع أقل من سنتين!' },
+            { text: 'قلم استنشاق النعناع ممنوع عليكي كأم مرضعة حتى لو بعيد عن الطفل، لكن مسحه على جلد الرضيع آمن.', correct: false, reaction: 'العكس تماماً! الخطر الأكبر والحاد هو ملامسة أبخرة المينثول لوجه وأنف الرضيع!' }
+          ],
+          timeline: [
+            { time: 'تثقيف الأم الفوري', state: 'حماية الرضيع بالكامل ومنع ملامسة زيت النعناع لوجهه أو ملابسه.' },
+            { time: 'أثناء السفر', state: 'استخدام الأم لقلم الاستنشاق لنفسها باعتدال وحفظه في مكان مغلق بعيد عن الطفل.' },
+            { time: 'بعد الرحلة', state: 'تحسن غثيان الأم وسلامة تنفس الرضيع بنسبة 100%.' }
+          ],
+          followUp: 'ألف شكر يا دكتور إنك أنقذت ابني ووضحتلي الفرق العلمي! استخدمت القلم لنفسي فقط بعيد عنه والحمد لله إحنا الاتنين بخير.',
+          science: 'قاعدة صيدلانية ذهبية: "الطبيعي لا يعني الآمن". ينبه L-Menthol مستقبلات البرودة TRPM8 في أنف وحنجرة الرضع (< سنتين) محفزاً منعكس كراتشمر (Kratschmer reflex) المؤدي لتشنج الحنجرة وتوقف التنفس (Apnea). بينما يُعد الاستنشاق العطري المعتدل للأم المرضعة مقبولاً بشرط إبعاده تماماً عن الرضيع.'
+        },
+        en: {
+          title: 'Breastfeeding Mother & 11-Month-Old Infant',
+          shortTag: 'Infant TRPM8 Alert',
+          name: 'Sara El-Menshawy',
+          demographics: '30 yrs • Female • Breastfeeding (11-Month-Old Infant)',
+          scenario: 'Requests Peppermint Inhaler for self + plans applying oil near 11-month-old face',
+          badge: 'CRITICAL INFANT ALERT',
+          bp: '112/72',
+          hr: '82 bpm',
+          spo2: '99%',
+          target: 'Infant TRPM8!',
+          openingMsg: 'Hello Doctor, I am breastfeeding and want the Peppermint Oil Inhaler for travel nausea. I also plan to apply a small drop of Peppermint oil near the face of my 11-month-old child for its aroma—since it’s natural!',
+          questions: [
+            { id: 'q1', prompt: 'How old is your child and where exactly did you plan to apply the oil?', reply: 'He is 11 months old; I planned to dab a tiny drop near his face or collar for the pleasant aroma.', clue: 'Infant < 2 years (11 months) → absolute contraindication near face/nose!' },
+            { id: 'q2', prompt: 'Do you or your baby have any known allergies?', reply: 'No known allergies for either of us.', clue: 'Hazard is neuro-respiratory TRPM8 reflex apnea, not allergy.' },
+            { id: 'q3', prompt: 'How do you intend to use the inhaler for yourself?', reply: 'Just brief nasal inhalation for myself during the trip, kept away from the baby.', clue: 'Occasional personal nasal inhalation in breastfeeding mother is acceptable if kept away from infant.' },
+            { id: 'q4', prompt: 'What would you like clarified about "natural" safety vs infant risk?', reply: 'Please distinguish the safety of my own proposed use from applying it near my baby, and whether "natural" means no adverse effects!', clue: 'Core Pharmacist Challenge unlocked!', triggersChallenge: true }
+          ],
+          challengePrompt: 'She asks: "Distinguish the safety of my own proposed use from applying the oil to my 11-month-old child, and whether natural means no adverse effects."',
+          challengeOptions: [
+            { text: 'Occasional personal nasal inhalation by a breastfeeding mother is acceptable if kept strictly away from the baby, whereas applying peppermint oil near an infant’s face (<2 yrs) is strictly contraindicated due to menthol-induced laryngospasm/apnea; "natural" does not mean risk-free.', correct: true, reaction: 'Thank goodness I asked you before putting a single drop near his face!' },
+            { text: 'Because peppermint oil is 100% natural, a tiny drop near a baby’s nose is completely safe.', correct: false, reaction: 'Critical danger! Menthol stimulates TRPM8 receptors in infants, triggering life-threatening laryngospasm and apnea!' },
+            { text: 'Both uses are identical—either both are safe or both are toxic.', correct: false, reaction: 'Route, dose, and age-dependent airway physiology create a massive safety difference!' }
+          ],
+          timeline: [
+            { time: 'Immediate Counseling', state: 'Prevented peppermint oil application near the 11-month-old infant’s face.' },
+            { time: 'During Travel', state: 'Mother used adult nasal inhaler sparingly for nausea and stored it safely away.' },
+            { time: 'Post-Travel', state: 'Mother’s nausea relieved and infant remained 100% safe and respiratory-stable.' }
+          ],
+          followUp: 'Thank you so much Doctor for protecting my baby and explaining why "natural" still requires clinical expertise!',
+          science: '"Natural" is not synonymous with safe. Concentrated L-menthol in Mentha × piperita stimulates nasal/laryngeal TRPM8 cold receptors in infants (<2 years), triggering the Kratschmer reflex—causing acute laryngospasm and respiratory arrest (apnea). Occasional adult nasal inhaler use by a breastfeeding mother is acceptable when kept strictly away from the infant.'
+        }
+      }
+    ];
+
+    /* =========================================================================
+       GLOBAL APPLICATION STATE
+       ========================================================================= */
+    const State = {
+      lang: 'ar',
+      view: 'hub', // 'hub' | 'station'
+      caseIdx: 0,
+      stationStep: 0, // 0: Triage, 1: Consultation, 2: QC Lab, 3: Dispensing
+      xp: 0,
+      timerSec: 360,
+      timerRunning: true,
+      cardFlipped: false,
+      activeLabHerb: 'ginger_hyoscyamus',
+      testedHerbs: new Set(),
+      cases: CASES.map(() => ({
+        comfort: 70,
+        vitalsDone: false,
+        medsDone: false,
+        askedIds: new Set(),
+        challengeTriggered: false,
+        challengeAnswered: false,
+        challengeCorrect: false,
+        selectedHerb: null,
+        selectedForm: null,
+        selectedSafeties: new Set(),
+        radarStatus: null, // null | 'pass' | 'warn'
+        radarMsgAr: '',
+        radarMsgEn: '',
+        completed: false,
+        stars: 0,
+        messages: []
+      }))
+    };
+
+    /* =========================================================================
+       TIMER & NAVIGATION HELPERS
+       ========================================================================= */
+    setInterval(() => {
+      if (!State.timerRunning) return;
+      if (State.timerSec > 0) {
+        State.timerSec--;
+        updateTimerLabel();
+      }
+    }, 1000);
+
+    function updateTimerLabel() {
+      const m = String(Math.floor(State.timerSec / 60)).padStart(2, '0');
+      const s = String(State.timerSec % 60).padStart(2, '0');
+      const el = document.getElementById('lbl-timer');
+      if (el) el.textContent = `${m}:${s}`;
+    }
+
+    function toggleTimer() {
+      State.timerRunning = !State.timerRunning;
+      const ic = document.getElementById('icon-timer');
+      if (ic) ic.setAttribute('data-lucide', State.timerRunning ? 'timer' : 'pause-circle');
+      SFX.play('tap');
+      safeLucide();
+    }
+
+    function toggleMute() {
+      SFX.muted = !SFX.muted;
+      const ic = document.getElementById('icon-mute');
+      if (ic) ic.setAttribute('data-lucide', SFX.muted ? 'volume-x' : 'volume-2');
+      safeLucide();
+    }
+
+    function toggleLang() {
+      State.lang = State.lang === 'ar' ? 'en' : 'ar';
+      document.documentElement.lang = State.lang;
+      document.documentElement.dir = State.lang === 'ar' ? 'rtl' : 'ltr';
+      SFX.play('tap');
+      render();
+    }
+
+    function openHub() {
+      State.view = 'hub';
+      SFX.play('tap');
+      render();
+    }
+
+    function enterCase(idx) {
+      State.caseIdx = idx;
+      State.stationStep = 0;
+      State.view = 'station';
+      State.cardFlipped = false;
+      State.activeLabHerb = CASES[idx].correctHerb;
+      initMessages(idx);
+      SFX.play('clue');
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setStationStep(step) {
+      State.stationStep = Math.max(0, Math.min(3, step));
+      SFX.play('tap');
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function stepStation(delta) {
+      const next = State.stationStep + delta;
+      if (next < 0) {
+        openHub();
+      } else if (next <= 3) {
+        setStationStep(next);
+      }
+    }
+
+    function initMessages(idx) {
+      const st = State.cases[idx];
+      if (st.messages.length === 0) {
+        st.messages.push({
+          sender: 'patient',
+          ar: CASES[idx].ar.openingMsg,
+          en: CASES[idx].en.openingMsg
+        });
+      }
+    }
+
+    /* =========================================================================
+       STATION 1 ACTIONS: TRIAGE, VITALS & CASE CARD FLIP
+       ========================================================================= */
+    function runTriageScan(kind) {
+      const st = State.cases[State.caseIdx];
+      if (kind === 'vitals' && !st.vitalsDone) {
+        st.vitalsDone = true;
+        st.comfort = Math.min(100, st.comfort + 5);
+        State.xp += 15;
+        SFX.play('clue');
+      } else if (kind === 'meds' && !st.medsDone) {
+        st.medsDone = true;
+        st.comfort = Math.min(100, st.comfort + 5);
+        State.xp += 15;
+        SFX.play('clue');
+      } else {
+        SFX.play('tap');
+      }
+      render();
+    }
+
+    function flipCaseCard() {
+      State.cardFlipped = !State.cardFlipped;
+      SFX.play('tap');
+      const card = document.getElementById('case-flip-card');
+      if (card) card.classList.toggle('flipped', State.cardFlipped);
+    }
+
+    /* =========================================================================
+       STATION 2 ACTIONS: CONSULTATION CHAT & CHALLENGE
+       ========================================================================= */
+    function askQuestion(qId) {
+      const c = CASES[State.caseIdx];
+      const st = State.cases[State.caseIdx];
+      if (st.askedIds.has(qId)) return;
+
+      const qAr = c.ar.questions.find(q => q.id === qId);
+      const qEn = c.en.questions.find(q => q.id === qId);
+      if (!qAr) return;
+
+      st.askedIds.add(qId);
+      st.comfort = Math.min(100, st.comfort + 7);
+      State.xp += 20;
+      SFX.play('clue');
+
+      st.messages.push({ sender: 'pharmacist', ar: qAr.prompt, en: qEn.prompt });
+      st.messages.push({ sender: 'patient', ar: qAr.reply, en: qEn.reply, clueAr: qAr.clue, clueEn: qEn.clue });
+      if (qAr.triggersChallenge) st.challengeTriggered = true;
+      render();
+    }
+
+    function handleFreeQuestion(e) {
+      e.preventDefault();
+      const input = document.getElementById('free-q-input');
+      const txt = input.value.trim();
+      if (!txt) return;
+      input.value = '';
+
+      const c = CASES[State.caseIdx];
+      const st = State.cases[State.caseIdx];
+      const lower = txt.toLowerCase();
+
+      st.messages.push({ sender: 'pharmacist', ar: txt, en: txt });
+
+      let mIdx = 3;
+      if (lower.includes('دواء') || lower.includes('أدوية') || lower.includes('ادوية') || lower.includes('حساسية') || lower.includes('حمل') || lower.includes('med') || lower.includes('allerg') || lower.includes('pregnan')) mIdx = 0;
+      else if (lower.includes('أعراض') || lower.includes('اعراض') || lower.includes('ارتجاع') || lower.includes('طفل') || lower.includes('رضيع') || lower.includes('symptom') || lower.includes('gerd') || lower.includes('infant') || lower.includes('child')) mIdx = 1;
+      else if (lower.includes('طعم') || lower.includes('استنشاق') || lower.includes('كبسول') || lower.includes('taste') || lower.includes('inhal') || lower.includes('capsule')) mIdx = 2;
+
+      const qAr = c.ar.questions[mIdx];
+      const qEn = c.en.questions[mIdx];
+      st.askedIds.add(qAr.id);
+      if (qAr.triggersChallenge) st.challengeTriggered = true;
+      SFX.play('clue');
+
+      st.messages.push({ sender: 'patient', ar: qAr.reply, en: qEn.reply, clueAr: qAr.clue, clueEn: qEn.clue });
+      render();
+    }
+
+    function submitChallenge(optIdx) {
+      const c = CASES[State.caseIdx];
+      const st = State.cases[State.caseIdx];
+      const optAr = c.ar.challengeOptions[optIdx];
+      const optEn = c.en.challengeOptions[optIdx];
+
+      st.challengeAnswered = true;
+      st.challengeCorrect = optAr.correct;
+      if (optAr.correct) {
+        st.comfort = Math.min(100, st.comfort + 12);
+        State.xp += 40;
+        SFX.play('clue');
+      } else {
+        st.comfort = Math.max(25, st.comfort - 18);
+        SFX.play('alarm');
+      }
+      st.messages.push({ sender: 'pharmacist', ar: optAr.text, en: optEn.text });
+      st.messages.push({ sender: 'patient', ar: optAr.reaction, en: optEn.reaction });
+      render();
+    }
+
+    /* =========================================================================
+       STATION 3 ACTIONS: INTERACTIVE PHARMACOGNOSY & QC LAB
+       ========================================================================= */
+    function selectLabHerb(herbId) {
+      State.activeLabHerb = herbId;
+      SFX.play('tap');
+      render();
+    }
+
+    function runChemicalQcTest(herbId) {
+      if (!State.testedHerbs.has(herbId)) {
+        State.testedHerbs.add(herbId);
+        State.xp += 15;
+      }
+      SFX.play('lab');
+      render();
+    }
+
+    function sendLabHerbToDispense(herbId) {
+      const st = State.cases[State.caseIdx];
+      st.selectedHerb = herbId;
+      st.radarStatus = null;
+      SFX.play('clue');
+      setStationStep(3);
+    }
+
+    /* =========================================================================
+       STATION 4 ACTIONS: DISPENSING, RADAR & 4D OUTCOME
+       ========================================================================= */
+    function pickHerb(id) {
+      const st = State.cases[State.caseIdx];
+      st.selectedHerb = id;
+      st.radarStatus = null;
+      SFX.play('tap');
+      render();
+    }
+
+    function pickForm(id) {
+      const st = State.cases[State.caseIdx];
+      st.selectedForm = id;
+      st.radarStatus = null;
+      SFX.play('tap');
+      render();
+    }
+
+    function toggleSafetyRule(id) {
+      const st = State.cases[State.caseIdx];
+      if (st.selectedSafeties.has(id)) st.selectedSafeties.delete(id);
+      else st.selectedSafeties.add(id);
+      st.radarStatus = null;
+      SFX.play('tap');
+      render();
+    }
+
+    function runSafetyRadar() {
+      const c = CASES[State.caseIdx];
+      const st = State.cases[State.caseIdx];
+      if (!st.selectedHerb || !st.selectedForm) {
+        st.radarStatus = 'warn';
+        st.radarMsgAr = 'اختر المستحضر العشبي والشكل الصيدلي أولاً لتشغيل الرادار الإكلينيكي.';
+        st.radarMsgEn = 'Select both an active herb and dosage form before running the Clinical Safety Radar.';
+        SFX.play('tap');
+        render();
+        return;
+      }
+
+      const herbOk = st.selectedHerb === c.correctHerb;
+      const formOk = st.selectedForm === c.correctForm;
+      const missing = c.requiredSafeties.filter(r => !st.selectedSafeties.has(r));
+
+      if (herbOk && formOk && missing.length === 0) {
+        st.radarStatus = 'pass';
+        st.radarMsgAr = 'فحص الرادار الإكلينيكي (PASS 100%): الوصفة مطابقة تماماً لملف المريض وخالية من الموانع والتداخلات.';
+        st.radarMsgEn = 'Clinical Safety Radar (PASS 100%): Regimen fully matches patient profile with zero contraindications.';
+        SFX.play('clue');
+      } else {
+        st.radarStatus = 'warn';
+        const warnsAr = [];
+        const warnsEn = [];
+        if (!herbOk) { warnsAr.push('العشبة المختارة غير مناسبة أو تسبب موانع استعمال'); warnsEn.push('Selected herb conflicts with mechanism or poses a contraindication'); }
+        if (!formOk) { warnsAr.push('الشكل الصيدلي لا يناسب الحالة'); warnsEn.push('Dosage form mismatches patient constraints'); }
+        if (missing.length > 0) { warnsAr.push(`ينقصك تفعيل (${missing.length}) ضوابط أمان إلزامية`); warnsEn.push(`Missing (${missing.length}) mandatory safety directive(s)`); }
+        st.radarMsgAr = `إنذار رادار الأمان: ${warnsAr.join(' • ')}.`;
+        st.radarMsgEn = `Safety Radar Alert: ${warnsEn.join(' • ')}.`;
+        SFX.play('alarm');
+      }
+      render();
+    }
+
+    function dispenseAndSimulate() {
+      const c = CASES[State.caseIdx];
+      const st = State.cases[State.caseIdx];
+      if (!st.selectedHerb || !st.selectedForm) return;
+
+      const herbOk = st.selectedHerb === c.correctHerb;
+      const formOk = st.selectedForm === c.correctForm;
+      const safetiesOk = c.requiredSafeties.every(r => st.selectedSafeties.has(r));
+
+      let stars = 1;
+      if (herbOk && formOk && safetiesOk) stars = 3;
+      else if (herbOk) stars = 2;
+
+      if (stars === 3 && !st.completed) {
+        st.completed = true;
+        State.xp += 120;
+      }
+      st.stars = Math.max(st.stars, stars);
+
+      const isAr = State.lang === 'ar';
+      const L = c[State.lang];
+
+      const modal = document.getElementById('outcome-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      const badge = document.getElementById('out-badge');
+      const title = document.getElementById('out-title');
+      const timeline = document.getElementById('out-timeline');
+      const reply = document.getElementById('out-reply');
+
+      if (stars === 3) {
+        SFX.play('success');
+        badge.className = 'font-mono text-xs font-bold uppercase tracking-wider text-emeraldGlow';
+        badge.textContent = isAr ? 'نتيجة إكلينيكية مثالية • 100% دقة' : 'OPTIMAL CLINICAL OUTCOME • 100% PRECISION';
+        title.textContent = isAr ? 'نجاح باهر في محطة الـ OSCE!' : 'OSCE Station Passed with Excellence!';
+        timeline.innerHTML = L.timeline.map((t, i) => `
+          <div class="p-3.5 rounded-2xl bg-emeraldDark/85 border border-emeraldGlow/35 space-y-1">
+            <div class="font-mono text-[10px] font-bold text-emeraldGlow">T+${i + 1} • ${t.time}</div>
+            <p class="text-xs text-white leading-relaxed">${t.state}</p>
+          </div>
+        `).join('');
+        reply.textContent = L.followUp;
+      } else {
+        SFX.play('alarm');
+        badge.className = 'font-mono text-xs font-bold uppercase tracking-wider text-rose-400';
+        badge.textContent = isAr ? 'تنبيه سلامة المريض • راجع الوصفة' : 'PATIENT SAFETY ALERT • REVISION REQUIRED';
+        title.textContent = !herbOk
+          ? (isAr ? 'خطأ في اختيار المستحضر النباتي!' : 'Contraindicated or Suboptimal Herb Selected!')
+          : (!formOk
+            ? (isAr ? 'الشكل الصيدلي غير ملائم للمريض!' : 'Unsuitable Pharmaceutical Dosage Form!')
+            : (isAr ? 'ضوابط الأمان الإلزامية غير مكتملة!' : 'Mandatory Safety Directives Incomplete!'));
+        timeline.innerHTML = `
+          <div class="sm:col-span-3 p-4 rounded-2xl bg-rose-950/45 border border-rose-500/45 text-xs sm:text-sm text-rose-100 leading-relaxed">
+            ${isAr
+              ? 'استخدم رادار الأمان في المحطة الرابعة ومختبر العقاقير في المحطة الثالثة للتحقق من العشبة، الشكل الصيدلي، وجميع ضوابط الأمان الخاصة بالحساسية أو الارتجاع أو الرضع.'
+              : 'Use the Clinical Safety Radar in Station 4 and the Pharmacognosy QC Lab in Station 3 to verify the botanical, dosage form, and mandatory safety directives.'}
+          </div>
+        `;
+        reply.textContent = isAr
+          ? 'يا دكتور لسه فيه مشكلة أو تحذير مش واضح، ممكن نراجع الخطة العلاجية تاني؟'
+          : 'Doctor, I still have symptoms or safety concerns—could we review the regimen again?';
+      }
+
+      document.getElementById('out-stars').innerHTML = [1, 2, 3].map(n => `
+        <i data-lucide="star" class="w-5 h-5 ${n <= stars ? 'text-goldLight fill-goldLight' : 'text-white/20'}"></i>
+      `).join('');
+
+      document.getElementById('out-reply-lbl').textContent = isAr ? 'رسالة متابعة المريض:' : 'Patient Follow-Up Feedback:';
+      document.getElementById('out-science-lbl').textContent = isAr ? 'التحليل العلمي ومبادئ العقاقير (MNU Pharmacognosy Debrief)' : 'MNU Pharmacognosy & Clinical Debrief';
+      document.getElementById('out-science').textContent = L.science;
+      document.getElementById('out-retry-lbl').textContent = isAr ? 'مراجعة الوصفة' : 'Revise Regimen';
+      document.getElementById('out-print-lbl').textContent = isAr ? 'طباعة التقرير' : 'Print Report';
+      document.getElementById('out-next-lbl').textContent = isAr ? 'الحالة التالية في الـ OSCE' : 'Next OSCE Case';
+
+      render();
+      safeLucide();
+    }
+
+    function closeOutcomeModal() {
+      const m = document.getElementById('outcome-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function proceedNextCase() {
+      closeOutcomeModal();
+      enterCase((State.caseIdx + 1) % CASES.length);
+    }
+
+    function safeLucide() {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    }
+
+    /* =========================================================================
+       MASTER RENDER ENGINE
+       ========================================================================= */
+    function render() {
+      const isAr = State.lang === 'ar';
+      const ranksAr = ['صيدلي متدرب', 'صيدلي إكلينيكي', 'أخصائي عقاقير', 'استشاري فايتوثيرابي'];
+      const ranksEn = ['Pharmacy Intern', 'Clinical Pharmacist', 'Pharmacognosy Specialist', 'Phytotherapy Consultant'];
+      const rankText = (isAr ? ranksAr : ranksEn)[Math.min(3, Math.floor(State.xp / 220))];
+
+      // Header
+      document.getElementById('hdr-rank').textContent = rankText;
+      document.getElementById('hdr-sub').textContent = isAr
+        ? 'منظومة المحطات الإكلينيكية المتكاملة • قسم العقاقير — كلية الصيدلة جامعة المنصورة الأهلية (MNU)'
+        : 'Multi-Station OSCE Clinical Suite • Pharmacognosy Dept — Mansoura National University';
+      document.getElementById('lbl-xp').textContent = `${State.xp} XP`;
+      document.getElementById('lbl-lang').textContent = isAr ? 'EN' : 'عربي';
+      document.getElementById('lbl-back-hub').textContent = isAr ? 'قاعة المحطات' : 'OSCE Hub';
+      document.getElementById('btn-back-hub').classList.toggle('hidden', State.view === 'hub');
+
+      const hubEl = document.getElementById('view-hub');
+      const stEl = document.getElementById('view-station');
+
+      if (State.view === 'hub') {
+        hubEl.classList.remove('hidden');
+        stEl.classList.add('hidden');
+        renderHub(rankText);
+      } else {
+        hubEl.classList.add('hidden');
+        stEl.classList.remove('hidden');
+        renderStationWorkspace();
+      }
+
+      safeLucide();
+    }
+
+    function renderHub(rankText) {
+      const isAr = State.lang === 'ar';
+      const completedCount = State.cases.filter(c => c.completed).length;
+      const totalStars = State.cases.reduce((acc, c) => acc + c.stars, 0);
+
+      document.getElementById('hub-eyebrow').textContent = isAr
+        ? 'تطبيق عملي متقدم لمادة الفايتوثيرابي والعقاقير — جامعة المنصورة الأهلية (MNU)'
+        : 'Advanced Clinical Phytotherapy OSCE Activity — Mansoura National University';
+      document.getElementById('hub-title').innerHTML = isAr
+        ? 'اختر محطة الحالة الإكلينيكية وابدأ جولة الـ <span class="text-goldLight">OSCE</span> الاحترافية'
+        : 'Select a Clinical Case Station & Launch Your <span class="text-goldLight">OSCE</span> Rotation';
+      document.getElementById('hub-desc').textContent = isAr
+        ? 'كل حالة مقسمة إلى 4 محطات سريرية مستقلة: (١) الفرز والعلامات الحيوية، (٢) غرفة الاستشارة الحية، (٣) مختبر العقاقير والاختبارات الكيميائية، و(٤) محطة الصرف والرادار والمحاكاة 4D.'
+        : 'Each case is organized into 4 dedicated clinical stations: (1) Triage & Vitals Bay, (2) Live Consultation Room, (3) Pharmacognosy QC Lab, and (4) Dispensing Radar & 4D Outcome.';
+
+      document.getElementById('hub-prog-title').textContent = isAr ? 'تقدمك في قاعة المحطات' : 'OSCE Floor Progress';
+      document.getElementById('hub-prog-count').textContent = `${completedCount} / ${CASES.length}`;
+      document.getElementById('hub-prog-bar').style.width = `${(completedCount / CASES.length) * 100}%`;
+      document.getElementById('hub-stat-stars-lbl').textContent = isAr ? 'النجوم المكتسبة' : 'Stars Earned';
+      document.getElementById('hub-stat-stars').textContent = `${totalStars} / 12`;
+      document.getElementById('hub-stat-rank-lbl').textContent = isAr ? 'التصنيف الإكلينيكي' : 'Clinical Rank';
+      document.getElementById('hub-stat-rank').textContent = rankText;
+
+      document.getElementById('hub-cases-grid').innerHTML = CASES.map((c, idx) => {
+        const L = c[State.lang];
+        const st = State.cases[idx];
+        return `
+          <article onclick="enterCase(${idx})" class="station-card rounded-[26px] p-5 sm:p-6 cursor-pointer flex flex-col justify-between gap-4">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="px-3 py-1 rounded-xl bg-goldRoyal/18 border border-goldRoyal/50 font-mono text-xs font-extrabold text-goldLight">
+                    STATION ${c.id}
+                  </span>
+                  <span class="px-2.5 py-1 rounded-xl bg-obsidian/80 border border-white/10 text-[11px] font-bold text-ivory/80">
+                    ${c.difficulty[State.lang]}
+                  </span>
+                </div>
+                <div class="flex items-center gap-0.5">
+                  ${[1, 2, 3].map(n => `<i data-lucide="star" class="w-4 h-4 ${n <= st.stars ? 'text-goldLight fill-goldLight' : 'text-white/15'}"></i>`).join('')}
+                </div>
+              </div>
+
+              <div>
+                <div class="text-xs font-mono text-emeraldGlow font-bold">${L.shortTag}</div>
+                <h3 class="text-lg sm:text-xl font-black text-white mt-0.5">${L.title}</h3>
+                <p class="text-xs text-ivory/75 mt-1 leading-relaxed">${L.scenario}</p>
+              </div>
+            </div>
+
+            <div class="pt-3.5 border-t border-goldRoyal/20 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2 text-xs text-ivory/80">
+                <i data-lucide="user-round" class="w-4 h-4 text-goldRoyal"></i>
+                <span class="font-semibold">${L.name}</span>
+              </div>
+              <span class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 ${
+                st.completed
+                  ? 'bg-emeraldGlow/20 text-emeraldGlow border border-emeraldGlow/40'
+                  : 'btn-gold'
+              }">
+                <span>${st.completed ? (isAr ? 'مراجعة المحطة' : 'Review Station') : (isAr ? 'دخول المحطة' : 'Enter Station')}</span>
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5 rtl-flip"></i>
+              </span>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderStationWorkspace() {
+      const isAr = State.lang === 'ar';
+      const c = CASES[State.caseIdx];
+      const st = State.cases[State.caseIdx];
+      const L = c[State.lang];
+
+      document.getElementById('ws-case-num').textContent = c.id;
+      document.getElementById('ws-pt-name').textContent = L.name;
+      document.getElementById('ws-pt-badge').textContent = st.completed ? (isAr ? 'مكتملة ✓' : 'Completed ✓') : L.badge;
+      document.getElementById('ws-pt-meta').textContent = `${L.demographics} • ${L.scenario}`;
+      document.getElementById('ws-trust-lbl').textContent = isAr ? 'ثقة المريض' : 'Patient Trust';
+      document.getElementById('ws-trust-pct').textContent = `${st.comfort}%`;
+      document.getElementById('ws-trust-bar').style.width = `${st.comfort}%`;
+
+      // 4 Sub-Stations Stepper
+      const steps = [
+        { idx: 0, icon: 'activity', ar: '١. محطة الفرز والفحص', en: '1. Triage & Vitals', done: st.vitalsDone && st.medsDone },
+        { idx: 1, icon: 'messages-square', ar: '٢. غرفة الاستشارة الحية', en: '2. Consultation Room', done: st.askedIds.size >= 2 && (!st.challengeTriggered || st.challengeAnswered) },
+        { idx: 2, icon: 'microscope', ar: '٣. مختبر العقاقير QC', en: '3. Pharmacognosy Lab', done: State.testedHerbs.size > 0 },
+        { idx: 3, icon: 'shield-check', ar: '٤. الصرف والرادار 4D', en: '4. Dispense & 4D Sim', done: st.completed }
+      ];
+
+      document.getElementById('station-stepper').innerHTML = steps.map(s => {
+        const active = State.stationStep === s.idx;
+        return `
+          <button onclick="setStationStep(${s.idx})" class="p-3 rounded-2xl border text-start flex items-center justify-between gap-2 transition ${
+            active
+              ? 'bg-gradient-to-r from-goldRoyal/25 to-emeraldDark border-goldLight text-white shadow-lg'
+              : 'bg-obsidian/70 border-goldRoyal/20 text-ivory/75 hover:border-goldRoyal/55 hover:text-white'
+          }">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${active ? 'bg-goldRoyal text-obsidian' : 'bg-emeraldDark text-goldLight'}">
+                <i data-lucide="${s.icon}" class="w-4 h-4"></i>
+              </div>
+              <span class="text-xs font-extrabold truncate">${isAr ? s.ar : s.en}</span>
+            </div>
+            ${s.done ? '<i data-lucide="check-circle-2" class="w-4 h-4 text-emeraldGlow shrink-0"></i>' : ''}
+          </button>
+        `;
+      }).join('');
+
+      // Bottom Nav Controls
+      document.getElementById('lbl-prev-st').textContent = State.stationStep === 0
+        ? (isAr ? 'العودة لقاعة المحطات' : 'Back to OSCE Hub')
+        : (isAr ? 'المحطة السابقة' : 'Previous Station');
+      document.getElementById('lbl-stage-indicator').textContent = `STATION ${State.stationStep + 1} OF 4`;
+      const nextBtn = document.getElementById('btn-next-st');
+      nextBtn.classList.toggle('hidden', State.stationStep === 3);
+      document.getElementById('lbl-next-st').textContent = isAr ? 'الانتقال للمحطة التالية' : 'Next Station';
+
+      // Render Active Station View
+      const stage = document.getElementById('station-stage');
+      if (State.stationStep === 0) stage.innerHTML = buildStation1Triage(c, st, L, isAr);
+      else if (State.stationStep === 1) stage.innerHTML = buildStation2Consult(c, st, L, isAr);
+      else if (State.stationStep === 2) stage.innerHTML = buildStation3Lab(c, st, L, isAr);
+      else stage.innerHTML = buildStation4Dispense(c, st, L, isAr);
+
+      if (State.stationStep === 1) {
+        const feed = document.getElementById('st2-chat-feed');
+        if (feed) feed.scrollTop = feed.scrollHeight;
+      }
+    }
+
+    /* =========================================================================
+       STATION 1 BUILDER: TRIAGE, VITALS MONITOR & FLIPPABLE MNU CASE CARD
+       ========================================================================= */
+    function buildStation1Triage(c, st, L, isAr) {
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Left: Live Vitals Telemetry & Diagnostic Sensors -->
+          <div class="lg:col-span-7 glass-panel rounded-3xl p-5 sm:p-6 space-y-5">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="font-mono text-[11px] font-bold text-emeraldGlow uppercase">STATION 01 • PATIENT TRIAGE &amp; TELEMETRY</span>
+                <h3 class="text-lg sm:text-xl font-black text-white mt-0.5">${isAr ? 'جهاز الفحص الحيوي واستقبال المريض' : 'Live Vitals & Clinical Intake Bay'}</h3>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-emeraldGlow/15 border border-emeraldGlow/40 font-mono text-[11px] font-bold text-emeraldGlow">LIVE</span>
+            </div>
+
+            <!-- Live ECG Monitor Display -->
+            <div class="p-4 rounded-2xl bg-obsidian/90 border border-goldRoyal/30 space-y-4">
+              <div class="flex items-center justify-between gap-4">
+                <svg viewBox="0 0 220 44" class="w-48 sm:w-64 h-11 overflow-visible">
+                  <path class="ecg-wave" fill="none" stroke="#10B981" stroke-width="2.2"
+                    d="M0,22 L30,22 L38,10 L46,34 L54,5 L62,39 L70,22 L120,22 L128,11 L136,33 L144,6 L152,38 L160,22 L220,22" />
+                </svg>
+                <div class="text-end">
+                  <div class="font-mono text-[10px] text-ivory/55">${isAr ? 'معدل النبض' : 'HEART RATE'}</div>
+                  <div class="font-mono text-lg font-extrabold text-emeraldGlow">${st.vitalsDone ? L.hr : '-- bpm'}</div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2.5 text-center pt-3 border-t border-white/10">
+                <div class="p-2.5 rounded-xl bg-emeraldDark/75 border border-white/5">
+                  <div class="text-[10px] font-mono text-ivory/55">BLOOD PRESSURE</div>
+                  <div class="font-mono text-sm font-extrabold text-white mt-0.5">${st.vitalsDone ? L.bp : '--/--'}</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-emeraldDark/75 border border-white/5">
+                  <div class="text-[10px] font-mono text-ivory/55">SpO2 LEVEL</div>
+                  <div class="font-mono text-sm font-extrabold text-emeraldGlow mt-0.5">${st.vitalsDone ? L.spo2 : '--%'}</div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-emeraldDark/75 border border-white/5">
+                  <div class="text-[10px] font-mono text-ivory/55">TARGET SYSTEM</div>
+                  <div class="font-mono text-xs font-extrabold text-goldLight mt-1 truncate">${st.vitalsDone ? L.target : (isAr ? 'بانتظار الفحص' : 'SCAN REQ')}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Diagnostic Buttons -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button onclick="runTriageScan('vitals')" class="interactive-tile p-4 rounded-2xl text-start flex items-center gap-3 ${st.vitalsDone ? 'border-emeraldGlow/60 bg-emeraldGlow/10' : ''}">
+                <div class="w-10 h-10 rounded-xl bg-emeraldGlow/15 border border-emeraldGlow/40 flex items-center justify-center shrink-0">
+                  <i data-lucide="heart-pulse" class="w-5 h-5 text-emeraldGlow"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-extrabold text-white">${st.vitalsDone ? (isAr ? 'تم قياس العلامات الحيوية ✓' : 'Vitals Verified ✓') : (isAr ? 'تشغيل جهاز العلامات الحيوية' : 'Run Vitals & Target Scan')}</div>
+                  <div class="text-[11px] text-ivory/65 mt-0.5">${isAr ? 'يكشف الضغط، النبض، والعضو المستهدف' : 'Unlocks BP, HR, SpO2 & target site'}</div>
+                </div>
+              </button>
+
+              <button onclick="runTriageScan('meds')" class="interactive-tile p-4 rounded-2xl text-start flex items-center gap-3 ${st.medsDone ? 'border-amber-400/60 bg-amber-500/10' : ''}">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-400/40 flex items-center justify-center shrink-0">
+                  <i data-lucide="shield-alert" class="w-5 h-5 text-amber-400"></i>
+                </div>
+                <div>
+                  <div class="text-xs font-extrabold text-white">${st.medsDone ? (isAr ? 'تم تدقيق السجل الدوائي ✓' : 'Med Audit Complete ✓') : (isAr ? 'تدقيق السجل الدوائي والحساسية' : 'Audit Meds & Allergy Record')}</div>
+                  <div class="text-[11px] text-ivory/65 mt-0.5">${isAr ? 'فحص سريع للتداخلات وموانع الاستعمال' : 'Screens baseline drugs & sensitivities'}</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Interactive 3D Flippable MNU Clinical Case Card -->
+          <div class="lg:col-span-5 glass-panel rounded-3xl p-5 sm:p-6 flex flex-col justify-between space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-goldLight flex items-center gap-1.5">
+                <i data-lucide="id-card" class="w-4 h-4 text-goldRoyal"></i>
+                <span>${isAr ? 'بطاقة الحالة الرسمية (MNU)' : 'Official MNU Case Card'}</span>
+              </span>
+              <button onclick="flipCaseCard()" class="px-3 py-1 rounded-xl bg-goldRoyal/20 border border-goldRoyal/50 text-goldLight text-[11px] font-bold hover:bg-goldRoyal/30 transition flex items-center gap-1.5">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                <span>${isAr ? 'اقلب البطاقة 180°' : 'Flip Card 180°'}</span>
+              </button>
+            </div>
+
+            <div class="flip-scene flex-1">
+              <div id="case-flip-card" class="flip-card ${State.cardFlipped ? 'flipped' : ''}">
+                <!-- Front -->
+                <div class="flip-face rounded-2xl bg-gradient-to-br from-emeraldDark to-obsidian border-2 border-goldRoyal/55 p-5 flex flex-col justify-between">
+                  <div class="flex items-center justify-between border-b border-goldRoyal/25 pb-2.5">
+                    <span class="font-mono text-[10px] text-goldRoyal font-bold">PHARMACOGNOSY DEPT • MNU</span>
+                    <span class="font-mono text-xs font-black text-goldLight">CASE ${c.id}/04</span>
+                  </div>
+                  <div class="text-center space-y-2 my-3">
+                    <div class="inline-block px-3 py-1 rounded-full bg-emeraldGlow/15 border border-emeraldGlow/40 font-mono text-[11px] text-emeraldGlow font-bold">${L.shortTag}</div>
+                    <h4 class="text-xl font-black text-white">${L.name}</h4>
+                    <p class="text-xs text-goldLight font-semibold">${L.demographics}</p>
+                    <p class="text-xs text-ivory/80 leading-relaxed pt-1">${L.scenario}</p>
+                  </div>
+                  <div class="text-center text-[11px] text-goldLight/80 font-bold">
+                    ${isAr ? 'اضغط "اقلب البطاقة" لقراءة القصة الكاملة وتحدي الصيدلي' : 'Click "Flip Card" for full narrative & challenge'}
+                  </div>
+                </div>
+
+                <!-- Back -->
+                <div class="flip-face flip-back rounded-2xl bg-obsidian border-2 border-goldRoyal/55 p-5 flex flex-col justify-between overflow-y-auto">
+                  <div class="space-y-2.5">
+                    <div class="text-[10px] font-mono font-bold text-goldRoyal uppercase">${isAr ? 'الشكوى الرئيسية للمريض' : 'PATIENT OPENING NARRATIVE'}</div>
+                    <p class="text-xs text-ivory leading-relaxed">${L.openingMsg}</p>
+                    <div class="p-3 rounded-xl bg-amber-950/35 border border-goldRoyal/45">
+                      <div class="text-[10px] font-bold text-goldLight mb-1">${isAr ? 'تحدي الصيدلي الإكلينيكي' : 'PHARMACIST CHALLENGE'}</div>
+                      <p class="text-xs font-bold text-white leading-relaxed">${L.challengePrompt}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* =========================================================================
+       STATION 2 BUILDER: LIVE CONSULTATION ROOM & CLUE BOARD
+       ========================================================================= */
+    function buildStation2Consult(c, st, L, isAr) {
+      const discovered = L.questions.filter(q => st.askedIds.has(q.id));
+
+      const chatHtml = st.messages.map(m => {
+        const text = isAr ? m.ar : m.en;
+        const clue = isAr ? m.clueAr : m.clueEn;
+        if (m.sender === 'pharmacist') {
+          return `
+            <div class="flex justify-end">
+              <div class="max-w-[82%] rounded-2xl rounded-ee-sm px-4 py-2.5 bg-gradient-to-br from-goldRoyal/25 to-emeraldDark border border-goldRoyal/45 text-xs sm:text-sm text-white">
+                <div class="text-[10px] font-bold text-goldLight mb-0.5">${isAr ? 'أنت (الصيدلي الإكلينيكي)' : 'You (Clinical Pharmacist)'}</div>
+                <p class="leading-relaxed">${text}</p>
+              </div>
+            </div>
+          `;
+        }
+        return `
+          <div class="flex justify-start">
+            <div class="max-w-[85%] rounded-2xl rounded-es-sm px-4 py-2.5 bg-obsidian/92 border border-white/12 text-xs sm:text-sm text-ivory space-y-1.5">
+              <div class="text-[10px] font-bold text-emeraldGlow">${L.name}</div>
+              <p class="leading-relaxed">${text}</p>
+              ${clue ? `<div class="pt-1.5 border-t border-white/10 text-[11px] text-goldLight flex items-center gap-1.5"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-goldRoyal shrink-0"></i><span>${clue}</span></div>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const challengeBlock = (st.challengeTriggered && !st.challengeAnswered) ? `
+        <div class="p-4 rounded-2xl bg-amber-950/35 border border-goldRoyal/65 space-y-2.5">
+          <div class="flex items-center gap-1.5 text-xs font-extrabold text-goldLight">
+            <i data-lucide="help-circle" class="w-4 h-4 text-goldRoyal"></i>
+            <span>${isAr ? 'تحدي الصيدلي الإكلينيكي — اختر الرد العلمي الأدق:' : 'Pharmacist Challenge — Choose the Best Clinical Response:'}</span>
+          </div>
+          <p class="text-xs text-white font-bold">${L.challengePrompt}</p>
+          <div class="space-y-2">
+            ${L.challengeOptions.map((o, i) => `
+              <button onclick="submitChallenge(${i})" class="w-full text-start p-3 rounded-xl bg-obsidian/90 hover:bg-emeraldDark border border-goldRoyal/35 text-xs text-ivory leading-relaxed transition">
+                ${o.text}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      ` : '';
+
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Main Chat Room (8 cols) -->
+          <div class="lg:col-span-8 glass-panel rounded-3xl flex flex-col min-h-[540px] max-h-[72vh]">
+            <div class="px-5 py-3.5 border-b border-goldRoyal/20 flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emeraldGlow opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emeraldGlow"></span>
+                </span>
+                <div>
+                  <h3 class="text-sm font-extrabold text-white">${isAr ? 'محطة 02: غرفة الاستشارة والمحادثة المباشرة' : 'Station 02: Live Patient Consultation Room'}</h3>
+                  <p class="text-[11px] text-ivory/65">${isAr ? 'اسأل المريض أسئلة الفرز أو اكتب سؤالك الحر لكشف الموانع وتحدي الصيدلي' : 'Ask triage questions or type custom questions to uncover red flags & challenge'}</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="st2-chat-feed" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
+              ${chatHtml}
+              ${challengeBlock}
+            </div>
+
+            <!-- Triage Buttons + Free Question -->
+            <div class="p-4 border-t border-goldRoyal/20 bg-obsidian/70 rounded-b-3xl space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                ${L.questions.map(q => {
+                  const asked = st.askedIds.has(q.id);
+                  return `
+                    <button onclick="askQuestion('${q.id}')" ${asked ? 'disabled' : ''} class="p-2.5 rounded-xl text-start text-xs border transition flex items-start justify-between gap-2 ${
+                      asked ? 'bg-obsidian/40 border-white/10 text-ivory/35 cursor-default' : 'interactive-tile text-white font-semibold'
+                    }">
+                      <span class="leading-snug">${q.prompt}</span>
+                      <i data-lucide="${asked ? 'check' : 'message-circle'}" class="w-3.5 h-3.5 shrink-0 mt-0.5 ${asked ? 'text-emeraldGlow' : 'text-goldRoyal'}"></i>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+
+              <form onsubmit="handleFreeQuestion(event)" class="flex items-center gap-2">
+                <input id="free-q-input" type="text" autocomplete="off"
+                  placeholder="${isAr ? 'اكتب أي سؤال حر للمريض (مثلاً: بتاخد أدوية؟ عندك حساسية؟)...' : 'Type any custom question to the patient...'}"
+                  class="flex-1 bg-emeraldDark/90 border border-goldRoyal/30 focus:border-goldLight rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-ivory/45 outline-none" />
+                <button type="submit" class="btn-gold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shrink-0">
+                  <i data-lucide="send" class="w-3.5 h-3.5 rtl-flip"></i>
+                  <span>${isAr ? 'اسأل' : 'Ask'}</span>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Right: Live Clues & Red Flags Board (4 cols) -->
+          <div class="lg:col-span-4 glass-panel rounded-3xl p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-goldRoyal/20 pb-3">
+              <h3 class="text-sm font-extrabold text-goldLight flex items-center gap-2">
+                <i data-lucide="clipboard-list" class="w-4 h-4 text-goldRoyal"></i>
+                <span>${isAr ? 'الخيوط الإكلينيكية المكتشفة' : 'Unlocked Clinical Clues'}</span>
+              </h3>
+              <span class="font-mono text-xs font-bold text-emeraldGlow">${discovered.length} / ${L.questions.length}</span>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+              ${discovered.length === 0
+                ? `<div class="p-4 rounded-2xl bg-obsidian/65 border border-dashed border-goldRoyal/25 text-ivory/55 text-center leading-relaxed">${isAr ? 'ابدأ بسؤال المريض من البطاقات بالأسفل لتسجيل المعطيات الإكلينيكية هنا تلقائياً.' : 'Interview the patient using the prompts to automatically log clinical findings here.'}</div>`
+                : discovered.map(q => `
+                  <div class="p-3 rounded-2xl bg-emeraldDark/85 border border-emeraldGlow/35 flex items-start gap-2.5">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-emeraldGlow shrink-0 mt-0.5"></i>
+                    <span class="text-ivory leading-relaxed">${q.clue}</span>
+                  </div>
+                `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* =========================================================================
+       STATION 3 BUILDER: INTERACTIVE PHARMACOGNOSY & CHEMICAL QC LAB
+       ========================================================================= */
+    function buildStation3Lab(c, st, L, isAr) {
+      const herb = HERBS.find(h => h.id === State.activeLabHerb) || HERBS[0];
+      const H = herb[State.lang];
+      const tested = State.testedHerbs.has(herb.id);
+
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Left: Herb Selector Bench (4 cols) -->
+          <div class="lg:col-span-4 glass-panel rounded-3xl p-5 space-y-3.5">
+            <div>
+              <span class="font-mono text-[10px] font-bold text-sky-300 uppercase">STATION 03 • PHARMACOGNOSY BENCH</span>
+              <h3 class="text-base font-extrabold text-white mt-0.5">${isAr ? 'اختر العينة النباتية للفحص' : 'Select Botanical Specimen'}</h3>
+            </div>
+
+            <div class="space-y-2.5">
+              ${HERBS.map(item => {
+                const active = item.id === herb.id;
+                const isTested = State.testedHerbs.has(item.id);
+                return `
+                  <button onclick="selectLabHerb('${item.id}')" class="w-full p-3.5 rounded-2xl border text-start transition flex items-center justify-between gap-2 ${
+                    active
+                      ? 'bg-gradient-to-r from-goldRoyal/25 to-emeraldDark border-goldLight text-white shadow'
+                      : 'interactive-tile text-ivory/85'
+                  }">
+                    <div class="min-w-0">
+                      <div class="text-xs font-extrabold truncate">${item[State.lang].name}</div>
+                      <div class="font-serif italic text-[11px] text-goldLight/80 truncate">${item[State.lang].latin}</div>
+                    </div>
+                    ${isTested ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emeraldGlow/20 text-emeraldGlow border border-emeraldGlow/40">QC ✓</span>' : '<i data-lucide="flask-conical" class="w-4 h-4 text-goldRoyal/70 shrink-0"></i>'}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Right: Interactive Reagent Test Tube + Monograph (8 cols) -->
+          <div class="lg:col-span-8 glass-panel rounded-3xl p-5 sm:p-6 space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-goldRoyal/20 pb-4">
+              <div>
+                <h3 class="text-lg sm:text-xl font-black text-white">${H.name}</h3>
+                <p class="font-serif italic text-sm text-goldLight">${H.latin}</p>
+              </div>
+
+              <button onclick="sendLabHerbToDispense('${herb.id}')" class="btn-gold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5">
+                <i data-lucide="arrow-right-circle" class="w-4 h-4 rtl-flip"></i>
+                <span>${isAr ? 'اعتماد العشبة والانتقال للصرف' : 'Select Herb & Go to Dispense'}</span>
+              </button>
+            </div>
+
+            <!-- Interactive Chemical QC Reagent Tube Simulator -->
+            <div class="p-4 rounded-2xl bg-obsidian/85 border border-sky-400/35 grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+              <div class="sm:col-span-3 flex flex-col items-center justify-center">
+                <!-- Animated Glass Test Tube -->
+                <div class="w-16 h-28 rounded-b-full rounded-t-md border-2 border-ivory/40 bg-white/5 relative overflow-hidden flex items-end p-1 shadow-inner">
+                  <div class="${tested ? 'reagent-liquid' : ''} w-full rounded-b-full transition-all duration-500"
+                    style="height: ${tested ? '74%' : '26%'}; background: ${tested ? herb.colorHex : 'rgba(255,255,255,0.14)'}; box-shadow: ${tested ? '0 0 22px ' + herb.colorHex : 'none'};">
+                  </div>
+                </div>
+                <span class="font-mono text-[10px] mt-2 text-center font-bold ${tested ? 'text-emeraldGlow' : 'text-ivory/50'}">
+                  ${tested ? herb.reagentColorLabel[State.lang] : (isAr ? 'بانتظار الكاشف' : 'Awaiting Reagent')}
+                </span>
+              </div>
+
+              <div class="sm:col-span-9 space-y-2.5">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-extrabold text-sky-300 flex items-center gap-1.5">
+                    <i data-lucide="test-tube-2" class="w-4 h-4"></i>
+                    <span>${H.qcName}</span>
+                  </span>
+                  <button onclick="runChemicalQcTest('${herb.id}')" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-sky-500/20 hover:bg-sky-500/30 text-sky-200 border border-sky-400/50 transition flex items-center gap-1.5">
+                    <i data-lucide="droplets" class="w-3.5 h-3.5"></i>
+                    <span>${tested ? (isAr ? 'إعادة الاختبار الكيميائي' : 'Re-run QC Test') : (isAr ? 'إضافة الكاشف وتشغيل الاختبار' : 'Add Reagent & Run QC Test')}</span>
+                  </button>
+                </div>
+
+                <p class="text-xs sm:text-sm leading-relaxed ${tested ? 'text-white' : 'text-ivory/55'}">
+                  ${tested ? H.qcResult : (isAr ? 'اضغط على "إضافة الكاشف وتشغيل الاختبار" لإظهار النتيجة الكيميائية والميكروسكوبية المؤكدة لنقاء العشبة.' : 'Click "Add Reagent & Run QC Test" to reveal the verified chemical & microscopic QC result.')}
+                </p>
+              </div>
+            </div>
+
+            <!-- Monograph Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+              <div class="p-3.5 rounded-2xl bg-emeraldDark/75 border border-goldRoyal/25 space-y-1">
+                <div class="font-mono text-[10px] font-bold text-goldRoyal uppercase">${isAr ? 'المواد الفعالة (Active Constituents)' : 'ACTIVE CONSTITUENTS'}</div>
+                <p class="text-white font-semibold leading-relaxed">${H.constituents}</p>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-emeraldDark/75 border border-emeraldGlow/30 space-y-1">
+                <div class="font-mono text-[10px] font-bold text-emeraldGlow uppercase">${isAr ? 'آلية العمل والمستقبلات' : 'MECHANISM & RECEPTORS'}</div>
+                <p class="text-ivory/95 leading-relaxed">${H.mechanism}</p>
+              </div>
+              <div class="sm:col-span-2 p-3.5 rounded-2xl bg-rose-950/35 border border-rose-400/45 space-y-1">
+                <div class="font-mono text-[10px] font-bold text-rose-300 uppercase">${isAr ? 'موانع الاستعمال والتحذيرات الإكلينيكية' : 'CONTRAINDICATIONS & WARNINGS'}</div>
+                <p class="text-rose-100 leading-relaxed">${H.cautions}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /* =========================================================================
+       STATION 4 BUILDER: DISPENSING BENCH, SAFETY RADAR & 4D LAUNCH
+       ========================================================================= */
+    function buildStation4Dispense(c, st, L, isAr) {
+      const selHerbObj = HERBS.find(h => h.id === st.selectedHerb);
+      const selFormObj = FORMS.find(f => f.id === st.selectedForm);
+
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Left: Rx Regimen Builder (7 cols) -->
+          <div class="lg:col-span-7 glass-panel rounded-3xl p-5 sm:p-6 space-y-5">
+            <div>
+              <span class="font-mono text-[10px] font-bold text-goldRoyal uppercase">STATION 04 • CLINICAL DISPENSING &amp; SAFETY</span>
+              <h3 class="text-lg font-black text-white mt-0.5">${isAr ? 'تكوين الوصفة العشبية وضوابط الأمان' : 'Assemble Botanical Regimen & Safety Controls'}</h3>
+            </div>
+
+            <!-- Step 1: Active Botanical -->
+            <div class="space-y-2">
+              <div class="text-xs font-extrabold text-goldLight flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-goldRoyal text-obsidian font-mono text-[11px] font-black flex items-center justify-center">1</span>
+                <span>${isAr ? 'اختر المستحضر النباتي الفعال' : 'Select Active Botanical'}</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                ${HERBS.map(h => {
+                  const sel = st.selectedHerb === h.id;
+                  return `
+                    <button onclick="pickHerb('${h.id}')" class="p-3 rounded-2xl border text-start transition flex items-center justify-between gap-2 ${
+                      sel ? 'bg-gradient-to-r from-goldRoyal/25 to-emeraldDark border-goldLight text-white shadow' : 'interactive-tile text-ivory/90'
+                    }">
+                      <div class="min-w-0">
+                        <div class="text-xs font-extrabold truncate">${h[State.lang].name}</div>
+                        <div class="font-serif italic text-[11px] text-goldLight/80 truncate">${h[State.lang].latin}</div>
+                      </div>
+                      <div class="w-4 h-4 rounded-full border shrink-0 flex items-center justify-center ${sel ? 'border-goldLight bg-goldLight' : 'border-white/30'}">
+                        ${sel ? '<div class="w-2 h-2 rounded-full bg-obsidian"></div>' : ''}
+                      </div>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- Step 2: Dosage Form -->
+            <div class="space-y-2">
+              <div class="text-xs font-extrabold text-goldLight flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-goldRoyal text-obsidian font-mono text-[11px] font-black flex items-center justify-center">2</span>
+                <span>${isAr ? 'حدد الشكل الصيدلي وطريقة الاستخدام' : 'Select Pharmaceutical Dosage Form'}</span>
+              </div>
+              <div class="space-y-2">
+                ${FORMS.map(f => {
+                  const sel = st.selectedForm === f.id;
+                  return `
+                    <button onclick="pickForm('${f.id}')" class="w-full p-3 rounded-2xl border text-start transition flex items-center justify-between gap-2 ${
+                      sel ? 'bg-gradient-to-r from-goldRoyal/25 to-emeraldDark border-goldLight text-white shadow' : 'interactive-tile text-ivory/90'
+                    }">
+                      <span class="text-xs font-semibold">${f[State.lang]}</span>
+                      <div class="w-4 h-4 rounded-full border shrink-0 flex items-center justify-center ${sel ? 'border-goldLight bg-goldLight' : 'border-white/30'}">
+                        ${sel ? '<div class="w-2 h-2 rounded-full bg-obsidian"></div>' : ''}
+                      </div>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- Step 3: Mandatory Safety Counseling -->
+            <div class="space-y-2">
+              <div class="text-xs font-extrabold text-goldLight flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-goldRoyal text-obsidian font-mono text-[11px] font-black flex items-center justify-center">3</span>
+                <span>${isAr ? 'فعّل ضوابط الأمان والتثقيف الإلزامية' : 'Activate Mandatory Safety Counseling'}</span>
+              </div>
+              <div class="space-y-1.5">
+                ${SAFETIES.map(s => {
+                  const chk = st.selectedSafeties.has(s.id);
+                  return `
+                    <button onclick="toggleSafetyRule('${s.id}')" class="w-full p-2.5 rounded-xl border text-start transition flex items-start gap-2.5 ${
+                      chk ? 'border-emeraldGlow/60 bg-emeraldGlow/15 text-white' : 'bg-obsidian/65 border-white/10 text-ivory/75 hover:border-goldRoyal/45'
+                    }">
+                      <i data-lucide="${chk ? 'check-square' : 'square'}" class="w-4 h-4 shrink-0 mt-0.5 ${chk ? 'text-emeraldGlow' : 'text-goldRoyal/70'}"></i>
+                      <span class="text-xs leading-snug font-medium">${s[State.lang]}</span>
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Live Dispensing Tray & Pre-Dispense Safety Radar (5 cols) -->
+          <div class="lg:col-span-5 glass-panel rounded-3xl p-5 sm:p-6 flex flex-col justify-between space-y-5">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between border-b border-goldRoyal/20 pb-3">
+                <h3 class="text-sm font-extrabold text-goldLight flex items-center gap-2">
+                  <i data-lucide="package-check" class="w-4 h-4 text-emeraldGlow"></i>
+                  <span>${isAr ? 'صينية الصرف ورادار الأمان' : 'Dispensing Tray & Safety Radar'}</span>
+                </h3>
+                <button onclick="runSafetyRadar()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/45 text-xs font-bold transition flex items-center gap-1.5">
+                  <i data-lucide="radar" class="w-3.5 h-3.5"></i>
+                  <span>${isAr ? 'تشغيل الرادار' : 'Run Radar'}</span>
+                </button>
+              </div>
+
+              <div class="space-y-2.5 text-xs">
+                <div class="p-3.5 rounded-2xl bg-obsidian/80 border border-white/10">
+                  <div class="text-[10px] font-mono text-ivory/55">${isAr ? 'المستحضر العشبي المختار' : 'SELECTED BOTANICAL'}</div>
+                  <div class="font-extrabold text-white mt-1">${selHerbObj ? selHerbObj[State.lang].name : '—'}</div>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-obsidian/80 border border-white/10">
+                  <div class="text-[10px] font-mono text-ivory/55">${isAr ? 'الشكل الصيدلي' : 'PHARMACEUTICAL FORM'}</div>
+                  <div class="font-bold text-white mt-1">${selFormObj ? selFormObj[State.lang] : '—'}</div>
+                </div>
+                <div class="p-3.5 rounded-2xl bg-obsidian/80 border border-white/10">
+                  <div class="text-[10px] font-mono text-ivory/55">${isAr ? 'ضوابط الأمان المفعّلة' : 'ACTIVE SAFETY RULES'}</div>
+                  <div class="font-mono font-extrabold text-emeraldGlow mt-1">${st.selectedSafeties.size} ${isAr ? 'ضوابط مفعلة' : 'Active'}</div>
+                </div>
+              </div>
+
+              ${st.radarStatus ? `
+                <div class="p-3.5 rounded-2xl text-xs font-semibold leading-relaxed border ${
+                  st.radarStatus === 'pass'
+                    ? 'border-emeraldGlow/55 bg-emeraldGlow/15 text-emeraldGlow'
+                    : 'border-rose-400/55 bg-rose-950/45 text-rose-200'
+                }">
+                  ${isAr ? st.radarMsgAr : st.radarMsgEn}
+                </div>
+              ` : `
+                <div class="p-3.5 rounded-2xl bg-emeraldDark/55 border border-dashed border-goldRoyal/30 text-xs text-ivory/65 leading-relaxed">
+                  ${isAr ? 'نصيحة صيدلانية: اضغط "تشغيل الرادار" لفحص وصفتك ضد حساسية المريض، الارتجاع، وعمر الرضيع قبل الصرف النهائي.' : 'Tip: Click "Run Radar" to scan your regimen against patient allergies, GERD, and infant safety before final dispensing.'}
+                </div>
+              `}
+            </div>
+
+            <button onclick="dispenseAndSimulate()" ${(!st.selectedHerb || !st.selectedForm) ? 'disabled' : ''} class="btn-gold w-full py-4 px-5 rounded-2xl text-sm flex items-center justify-center gap-2">
+              <i data-lucide="play-circle" class="w-5 h-5"></i>
+              <span>${isAr ? 'اعتماد الصرف وتشغيل المحاكاة 4D' : 'Dispense & Launch 4D Simulation'}</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Boot Application Safely
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        updateTimerLabel();
+        render();
+      } catch (err) {
+        console.error('PHYTO-OSCE Boot Error:', err);
+      }
+    });
+  </script>
+</body>
+</html>
